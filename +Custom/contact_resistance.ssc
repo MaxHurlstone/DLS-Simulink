@@ -1,0 +1,75 @@
+component contact_resistance < foundation.thermal.branch
+% Thermal Contact Resistance
+% This block represents a contact resistance in a thermal network. The heat
+% flow rate is proportional to the temperature difference and inversely
+% proportional to the resistance. The resistance is calculated using the 
+% Cooper-Mikic-Yovanovich (CMY) correlation, which is valid for isotropic rough
+% surfaces, assuming plastic deformation of surface asperities.
+
+% Custom component modified from resistance.ssc
+ 
+annotations
+    Icon = 'contact_resistance.svg';
+end
+
+parameters
+    k1 = {100, 'W/(m*K)'} % Conductivities material 1
+    k2 = {100, 'W/(m*K)'} % Condsuctivities material 2
+
+    s1 = {0.00001, 'm'} % Surface roughness material 1
+    s2 = {0.00001, 'm'} % Surface roughness material 2
+
+    vh1 = {150, '1'} % Vickers hardness material 1
+    vh2 = {150, '1'} % Vickers hardness material 2
+
+    Fc = {200, 'N'} % Contact force
+    Ac = {1, 'm^2'} % Contact area
+end
+
+parameters (Access = private)
+    % Harmonic mean of contacting surface conductivities
+    k_hm = (2*k1*k2)/(k1+k2);
+
+    % Asperity RMS average height
+    s_asp = sqrt(s1^2 + s2^2);
+
+    m_unit = {1, 'm'};
+
+    s1m = {...
+    if gt(s1, {0.000002, 'm'}), ...
+        0.152*((s1/m_unit)*10^6)^0.4 ...
+    else ...
+        0.124*((s1/m_unit)*10^6)^0.743 ...
+    end, '1'};
+    
+    s2m = {...
+    if gt(s2, {0.000002, 'm'}), ...
+        0.152*((s2/m_unit)*10^6)^0.4 ...
+    else ...
+        0.124*((s2/m_unit)*10^6)^0.743 ...
+    end, '1'};
+
+    m_asp = sqrt(s1m^2 + s2m^2);
+
+    % Find softer material, then find its microhardness
+    vh_soft = min([vh1, vh2]);
+    Hc = {vh_soft*9810000, 'Pa'};
+
+    % Calculate pressure
+    p = Fc/Ac;
+
+    % Calculate Cooper-Mikic-Yovanovich (CMY) Correlation
+    h = 1.25*k_hm*(m_asp/s_asp)*((p/Hc)^0.95);
+    resistance = 1/(h*Ac);
+end
+
+equations
+    assert(resistance >= 0)
+    if isfinite(resistance)
+        T == resistance * Q;
+    else
+        Q == 0;
+    end
+end
+
+end

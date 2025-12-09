@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:d="http://www.mathworks.com/blockgraphics" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="svg" width="5694" height="3804" viewBox="0 0 5694 3804" d:options="Foreground:PortStyled;Background:Transparent;StrokeScaling:PortStyled;StrokeScalingOnResize:NonScaling;LineExtension:On;Rotate:On;Resize:FitToBlock;Frame:Off;Clipping:None;PreAdjustStrokeWidth:Normalized;Port:Auto Majority;">
+	<g id="part" title="part_0" ie-ports="left:foundation-thermal-thermal,top:,right:foundation-thermal-thermal,bottom:">
+		<g id="group" style="stroke-width:.025in; fill:none">
+			<rect id="rect" style="stroke:#000000;stroke-width:8;stroke-linejoin:miter;stroke-linecap:butt;fill:none" d:options="ClosedShapeFill:On;" x="1429" y="956" width="1200" height="1889" rx="0" ry="0"/>
+			<path id="path" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; " d=" M 12,1901 L 1429,1901 L 1665,2374 L 2137,1429 L 2610,2374 L 3082,1429 L 3555,2374 L 4027,1429 L 4263,1901 L 5681,1901"/>
+		</g>
+		<rect id="rect_1" style="stroke:#000000;stroke-width:8;stroke-linejoin:miter;stroke-linecap:butt;fill:none" d:options="ClosedShapeFill:On;" x="3063" y="957.5" width="1200" height="1889" rx="0" ry="0"/>
+	</g>
+</svg>
