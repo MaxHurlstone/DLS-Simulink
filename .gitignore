@@ -29,3 +29,6 @@ codegen/
 
 # Octave session info
 octave-workspace
+
+# Test generated library files
+DLS_Simscape_lib.slx

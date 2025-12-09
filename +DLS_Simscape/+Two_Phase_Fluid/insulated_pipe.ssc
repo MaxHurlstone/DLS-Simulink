@@ -1,0 +1,414 @@
+component insulated_pipe
+% Insulated Pipe (2P) : 2.5
+% This block models pipe flow dynamics in a two-phase fluid network due to
+% viscous friction losses and convective heat transfer with the pipe wall.
+% You can optionally include the effects of fluid inertia.
+%
+% The pipe contains a constant volume of fluid. Pressure and specific
+% internal energy vary dynamically based on the net mass and energy
+% accumulation in the volume. Selecting Enable fluid inertia causes the
+% fluid to resist acceleration.
+%
+% Ports A and B are the two-phase fluid conserving ports associated with
+% the pipe inlet and outlet. Port H is the thermal conserving port
+% associated with the pipe wall.
+
+% Copyright 2013-2024 The MathWorks, Inc.
+
+nodes
+    A = foundation.two_phase_fluid.two_phase_fluid; % A:left
+    B = foundation.two_phase_fluid.two_phase_fluid; % B:right
+end
+
+parameters
+    length       = {5,     'm'  }; % Pipe length
+    area         = {0.01,  'm^2'}; % Cross-sectional area
+    Dh           = {0.1,   'm'  }; % Hydraulic diameter
+    length_add   = {0.1,   'm'  }; % Aggregate equivalent length of local resistances
+    roughness    = {15e-6, 'm'  }; % Internal surface absolute roughness
+    Re_lam       = {2000,  '1'  }; % Laminar flow upper Reynolds number limit
+    Re_tur       = {4000,  '1'  }; % Turbulent flow lower Reynolds number limit
+    shape_factor = {64,    '1'  }; % Laminar friction constant for Darcy friction factor
+
+    inertia      = false;          % Enable fluid inertia
+    energy_spec = foundation.enum.energy_spec.temperature; % Initial fluid energy specification
+    %                                                        1 - temperature
+    %                                                        2 - quality
+    %                                                        3 - void_fraction
+    %                                                        4 - enthalpy
+    %                                                        5 - internal_energy
+    p_init        = {0.101325, 'MPa'  }; % Initial pressure
+end
+parameters (ExternalAccess = none)
+    T_init        = {293.15,   'K'    }; % Initial temperature
+    x_init        = {0.5,      '1'    }; % Initial vapor quality
+    alpha_init    = {0.5,      '1'    }; % Initial vapor void fraction
+    h_init        = {1500,     'kJ/kg'}; % Initial specific enthalpy
+    u_init        = {1500,     'kJ/kg'}; % Initial specific internal energy
+    mdot_init     = {0,        'kg/s' }; % Initial mass flow rate from port A to port B
+end
+parameters
+    time_constant = {0.1,      's'    }; % Phase change time constant
+end
+
+% Parameter groups
+annotations
+    UILayout = [
+    UIGroup('physmod:simscape:library:gui:groups:Geometry', ...
+        length, area, Dh)
+    UIGroup('physmod:simscape:library:gui:groups:FrictionAndHeatTransfer', ...
+        length_add, roughness, Re_lam, Re_tur, shape_factor)
+    UIGroup('physmod:simscape:library:gui:groups:EffectsAndInitialConditions', ...
+        inertia, energy_spec, p_init, T_init, x_init, alpha_init, h_init, u_init, mdot_init, time_constant)]
+end
+
+parameters (Access = private)
+    % Pipe volume
+    volume = area*length;
+
+    % Pipe surface area
+    surface_area = (4*area/Dh)*length;
+
+    % Effective length for viscous friction calculation
+    effective_length = length + length_add;
+
+    % Relative roughness
+    relative_roughness = roughness/Dh;
+end
+
+% Parameter checks and visibility
+equations
+    assert(length > 0)
+    assert(area > 0)
+    assert(Dh > 0)
+    assert(length_add >= 0)
+    assert(roughness > 0)
+    assert(Re_lam > 1)
+    assert(Re_tur > Re_lam)
+    assert(shape_factor > 0)
+    assert(p_init >= A.p_min)
+    assert(p_init <= A.p_max)
+    assert(time_constant > 0)
+end
+
+if inertia
+    annotations
+        mdot_init : ExternalAccess = modify;
+    end
+end
+
+% Initial condition
+if energy_spec == foundation.enum.energy_spec.temperature
+    annotations
+        T_init : ExternalAccess = modify;
+    end
+    equations
+        assert(T_init >= T_min_init)
+        assert(T_init <= T_max_init)
+    end
+elseif energy_spec == foundation.enum.energy_spec.quality
+    annotations
+        x_init : ExternalAccess = modify;
+    end
+    equations
+        assert(p_init < A.p_crit)
+        assert(x_init >= 0)
+        assert(x_init <= 1)
+    end
+elseif energy_spec == foundation.enum.energy_spec.void_fraction
+    annotations
+        alpha_init : ExternalAccess = modify;
+    end
+    equations
+        assert(p_init < A.p_crit)
+        assert(alpha_init >= 0)
+        assert(alpha_init <= 1)
+    end
+elseif energy_spec == foundation.enum.energy_spec.enthalpy
+    annotations
+        h_init : ExternalAccess = modify;
+    end
+    equations
+        assert(h_init >= h_min_init)
+        assert(h_init <= h_max_init)
+    end
+else % energy_spec == foundation.enum.energy_spec.internal_energy
+    annotations
+        u_init : ExternalAccess = modify;
+    end
+    equations
+        assert(u_init >= A.u_min)
+        assert(u_init <= A.u_max)
+    end
+end
+
+parameters (Access = private)
+    % Calculate initial specific internal energy corresponding to
+    % specified initial conditions
+    [u_init_used, unorm_init, T_min_init_, T_max_init_, h_min_init_, h_max_init_] = ...
+        foundation.two_phase_fluid.internal_energy(p_init, T_init, ...
+        x_init, alpha_init, h_init, u_init, energy_spec, 0, A.u_min, A.u_max, ...
+        A.unorm_TLU, A.unorm_liq_TLU, A.unorm_vap_TLU, A.p_TLU, A.v_TLU, A.T_TLU, ...
+        A.u_sat_liq_TLU, A.u_sat_vap_TLU);
+
+    % Friendly names for asserts
+    T_min_init = T_min_init_; % minimum valid temperature at Initial pressure
+    T_max_init = T_max_init_; % maximum valid temperature at Initial pressure
+    h_min_init = h_min_init_; % minimum valid specific enthalpy at Initial pressure
+    h_max_init = h_max_init_; % maximum valid specific enthalpy at Initial pressure
+
+    % Initial specific volume
+    v_init = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU, unorm_init, p_init, ...
+        interpolation = linear, extrapolation = linear);
+end
+
+variables (Access = protected)
+    Phi_A  = {0, 'kW'}; % Energy flow rate into port A
+    Phi_B  = {0, 'kW'}; % Energy flow rate into port B
+
+    p_I = {value = p_init,      priority = priority.high}; % Pressure of fluid volume
+    u_I = {value = u_init_used, priority = priority.high}; % Specific internal energy of fluid volume
+end
+
+annotations
+    u_I  : LoggingUnit = 'kJ/kg';
+end
+
+variables (Access = protected, ExternalAccess = none)
+    rho_continuity = {value = 1/v_init, priority = priority.high}; % Fluid mass divided by fluid volume from integrating continuity equation
+
+    u_A = u_init_used; % Specific internal energy for momentum flux calculations
+    u_B = u_init_used; % Specific internal energy for momentum flux calculations
+end
+
+branches
+    mdot_A : A.mdot -> *;
+    mdot_B : B.mdot -> *;
+    Phi_A  : A.Phi  -> *;
+    Phi_B  : B.Phi  -> *;
+end
+
+intermediates (Access = private, ExternalAccess = none)
+    % Port pressure
+    p_A = A.p;
+    p_B = B.p;
+
+    % Normalized internal energy
+    unorm_I = foundation.two_phase_fluid.normalized_internal_energy(u_I, p_I, ...
+        A.u_min, A.u_max, A.p_TLU, A.u_sat_liq_TLU, A.u_sat_vap_TLU);
+
+    % Fluid properties
+    mu_I = tablelookup(A.unorm_TLU, A.p_TLU, A.nu_TLU, unorm_I, p_I, interpolation = linear, extrapolation = nearest)/v_I;
+    k_I  = tablelookup(A.unorm_TLU, A.p_TLU, A.k_TLU,  unorm_I, p_I, interpolation = linear, extrapolation = nearest);
+    Pr_I = tablelookup(A.unorm_TLU, A.p_TLU, A.Pr_TLU, unorm_I, p_I, interpolation = linear, extrapolation = nearest);
+
+    % Saturation properties
+    v_sat_liq_I  = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU,  0, p_I, interpolation = linear, extrapolation = linear);
+    v_sat_vap_I  = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU,  1, p_I, interpolation = linear, extrapolation = linear);
+    mu_sat_liq_I = tablelookup(A.unorm_TLU, A.p_TLU, A.nu_TLU, 0, p_I, interpolation = linear, extrapolation = nearest)/v_sat_liq_I;
+    k_sat_liq_I  = tablelookup(A.unorm_TLU, A.p_TLU, A.k_TLU,  0, p_I, interpolation = linear, extrapolation = nearest);
+    Pr_sat_liq_I = tablelookup(A.unorm_TLU, A.p_TLU, A.Pr_TLU, 0, p_I, interpolation = linear, extrapolation = nearest);
+
+    % Density partial derivatives table lookup
+    DrhoDp_liq_I = tablelookup(A.unorm_liq_TLU, A.p_TLU, A.DrhoDp_liq_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+    DrhoDp_vap_I = tablelookup(A.unorm_vap_TLU, A.p_TLU, A.DrhoDp_vap_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+    DrhoDp_mix_I = tablelookup(A.unorm_mix_TLU, A.p_TLU, A.DrhoDp_mix_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+    DrhoDu_liq_I = tablelookup(A.unorm_liq_TLU, A.p_TLU, A.DrhoDu_liq_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+    DrhoDu_vap_I = tablelookup(A.unorm_vap_TLU, A.p_TLU, A.DrhoDu_vap_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+    DrhoDu_mix_I = tablelookup(A.unorm_mix_TLU, A.p_TLU, A.DrhoDu_mix_TLU, unorm_I, p_I, interpolation = linear, extrapolation = linear);
+
+    % Apply a smooth transition to the density partial derivatives
+    % when going from the liquid or vapor region to the two-phase region
+    DrhoDp_I = simscape.function.blend( ...
+        simscape.function.blend(DrhoDp_liq_I, DrhoDp_mix_I, 0, A.transition_range, unorm_I), ...
+        DrhoDp_vap_I, (1 - A.transition_range), 1, unorm_I);
+
+    DrhoDu_I = simscape.function.blend( ...
+        simscape.function.blend(DrhoDu_liq_I, DrhoDu_mix_I, 0, A.transition_range, unorm_I), ...
+        DrhoDu_vap_I, (1 - A.transition_range), 1, unorm_I);
+
+    % Correction term to account for errors associated with
+    % the smoothing of the density partial derivatives
+    correction = (mass - volume/v_I) / time_constant;
+
+    % Time derivative of specific internal energy from energy conservation
+    der_u_I = (Phi_A + Phi_B - (mdot_A + mdot_B)*u_I) / mass;
+
+    % Absolute value of mass flow rate
+    mdot_A_abs = if ge(mdot_A, 0), mdot_A else -mdot_A end;
+    mdot_B_abs = if ge(mdot_B, 0), mdot_B else -mdot_B end;
+
+    % Reynolds numbers
+    Re_A = (mdot_A_abs * Dh) / (area * mu_I);
+    Re_B = (mdot_B_abs * Dh) / (area * mu_I);
+
+    % Turbulent pipe flow Darcy friction factor using the Haaland correlation
+    Re_A1 = if ge(Re_A, 1), Re_A else 1 end;
+    Re_B1 = if ge(Re_B, 1), Re_B else 1 end;
+    friction_factor_A = 1 / (-1.8 * log10(6.9/Re_A1 + value(relative_roughness/3.7, '1')^1.11))^2;
+    friction_factor_B = 1 / (-1.8 * log10(6.9/Re_B1 + value(relative_roughness/3.7, '1')^1.11))^2;
+
+    % Laminar regime viscous friction
+    friction_lam_A = mdot_A * volume/mass * mu_I * shape_factor * effective_length / (4 * Dh^2 * area);
+    friction_lam_B = mdot_B * volume/mass * mu_I * shape_factor * effective_length / (4 * Dh^2 * area);
+
+    % Turbulent regime viscous friction
+    friction_tur_A = mdot_A * mdot_A_abs * volume/mass * friction_factor_A * effective_length / (4 * Dh * area^2);
+    friction_tur_B = mdot_B * mdot_B_abs * volume/mass * friction_factor_B * effective_length / (4 * Dh * area^2);
+
+    % Specific volume for momentum flux calculations
+    unorm_A = foundation.two_phase_fluid.normalized_internal_energy(u_A, p_A, ...
+        A.u_min, A.u_max, A.p_TLU, A.u_sat_liq_TLU, A.u_sat_vap_TLU);
+    unorm_B = foundation.two_phase_fluid.normalized_internal_energy(u_B, p_B, ...
+        A.u_min, A.u_max, A.p_TLU, A.u_sat_liq_TLU, A.u_sat_vap_TLU);
+    v_A = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU, unorm_A, p_A, interpolation = linear, extrapolation = linear);
+    v_B = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU, unorm_B, p_B, interpolation = linear, extrapolation = linear);
+
+    % Change in flow velocity
+    delta_vel_AI = (volume/mass - v_A)*mdot_A/area;
+    delta_vel_BI = (volume/mass - v_B)*mdot_B/area;
+    delta_vel_pos_AI = if ge(delta_vel_AI, 0), delta_vel_AI else -delta_vel_AI end;
+    delta_vel_pos_BI = if gt(delta_vel_BI, 0), delta_vel_BI else -delta_vel_BI end;
+
+    % Average mass flow rate
+    mdot_avg = (mdot_A - mdot_B)/2;
+    mdot_avg_abs = if ge(mdot_avg, 0), mdot_avg else -mdot_avg end;
+
+    % Reynolds numbers
+    Re_I = (mdot_avg_abs * Dh) / (area * mu_I);
+    Re_sat_liq_I = (mdot_avg_abs * Dh) / (area * mu_sat_liq_I);
+
+    % Turbulent pipe flow Darcy friction factor using the Haaland correlation
+    Re_I1 = if gt(Re_I, 1000), Re_I else 1000 end;
+    friction_factor_I = 1 / (-1.8 * log10(6.9/Re_I1 + value(relative_roughness/3.7, '1')^1.11))^2;
+
+    % Vapor void fraction
+    alpha_I = ...
+        if le(unorm_I, 0), ...
+            unorm_I ...
+        elseif ge(unorm_I, 1), ...
+            unorm_I ...
+        else ...
+            v_sat_vap_I*unorm_I/(v_sat_liq_I + (v_sat_vap_I - v_sat_liq_I)*unorm_I) ...
+        end;
+
+end
+
+% For logging
+intermediates (Access = private)
+    % Fluid properties
+    mass = rho_continuity * volume;                      % Fluid mass
+    h_I = u_I + p_I*volume/mass;                         % Specific enthalpy of fluid volume
+    v_I = tablelookup(A.unorm_TLU, A.p_TLU, A.v_TLU, unorm_I, p_I, ...
+        interpolation = linear, extrapolation = linear); % Specific volume of fluid volume
+    T_I = tablelookup(A.unorm_TLU, A.p_TLU, A.T_TLU, unorm_I, p_I, ...
+        interpolation = linear, extrapolation = linear); % Temperature of fluid volume
+    x_I = simscape.function.limit(unorm_I, 0, 1, false); % Vapor quality of fluid volume
+
+    % Pressure loss due to viscous friction
+    pressure_loss_A = simscape.function.blend(friction_lam_A, friction_tur_A, Re_lam, Re_tur, Re_A); % Viscous friction pressure loss at port A
+    pressure_loss_B = simscape.function.blend(friction_lam_B, friction_tur_B, Re_lam, Re_tur, Re_B); % Viscous friction pressure loss at port B
+end
+
+annotations
+    mass                               : LoggingUnit = 'kg';
+    h_I                                : LoggingUnit = 'kJ/kg';
+    v_I                                : LoggingUnit = 'm^3/kg';
+    T_I                                : LoggingUnit = 'K';
+    x_I                                : LoggingUnit = '1';
+    [pressure_loss_A, pressure_loss_B] : LoggingUnit = 'MPa';
+end
+
+if ~inertia
+
+    variables (Access = private)
+        mdot_A = {0, 'kg/s'}; % Mass flow rate into port A
+        mdot_B = {0, 'kg/s'}; % Mass flow rate into port B
+    end
+
+    equations
+        % Momentum balance
+        p_A - p_I == delta_vel_pos_AI*mdot_A/area + pressure_loss_A;
+        p_B - p_I == delta_vel_pos_BI*mdot_B/area + pressure_loss_B;
+    end
+
+else % inertia
+
+    variables (Access = private)
+        mdot_A = {value =  mdot_init, priority = priority.high}; % Mass flow rate into port A
+        mdot_B = {value = -mdot_init, priority = priority.high}; % Mass flow rate into port B
+    end
+
+    % For logging
+    intermediates (Access = private)
+        inertia_A = p_A - p_I - delta_vel_pos_AI*mdot_A/area - pressure_loss_A; % Fluid inertia at port A
+        inertia_B = p_B - p_I - delta_vel_pos_BI*mdot_B/area - pressure_loss_B; % Fluid inertia at port B
+    end
+
+    annotations
+        [inertia_A, inertia_B] : LoggingUnit = 'MPa';
+    end
+
+    equations
+        % Momentum balance
+        p_A - p_I == der(mdot_A)*length/2/area + delta_vel_pos_AI*mdot_A/area + pressure_loss_A;
+        p_B - p_I == der(mdot_B)*length/2/area + delta_vel_pos_BI*mdot_B/area + pressure_loss_B;
+    end
+
+end
+
+equations
+    % Mass conservation
+    der(mass) == mdot_A + mdot_B;
+    % Calculate pressure from mass conservation equation based on density partial derivatives
+    % Apply correction term to account for any errors in density partial derivatives
+    (DrhoDp_I*der(p_I) + DrhoDu_I*der_u_I) * volume == mdot_A + mdot_B + correction;
+
+    % Energy conservation
+    mass*der(u_I) + (mdot_A + mdot_B)*u_I == Phi_A + Phi_B;
+
+    % Change in specific internal energy for momentum flux calculations
+    u_A + p_A*v_A - u_I - p_I*volume/mass == (volume/mass - v_A) * abs(volume/mass + v_A) * (mdot_A/area)^2/2;
+    u_B + p_B*v_B - u_I - p_I*volume/mass == (volume/mass - v_B) * abs(volume/mass + v_B) * (mdot_B/area)^2/2;
+
+    % Run-time variable checks
+    assert(A.p >= A.p_min, message('physmod:simscape:library:two_phase_fluid:PressureMinValid', 'A'), Action = A.properties_range_check)
+    assert(A.p <= A.p_max, message('physmod:simscape:library:two_phase_fluid:PressureMaxValid', 'A'), Action = A.properties_range_check)
+    assert(A.u >= A.u_min, message('physmod:simscape:library:two_phase_fluid:InternalEnergyMinValid', 'A'), Action = A.properties_range_check)
+    assert(A.u <= A.u_max, message('physmod:simscape:library:two_phase_fluid:InternalEnergyMaxValid', 'A'), Action = A.properties_range_check)
+    assert(B.p >= B.p_min, message('physmod:simscape:library:two_phase_fluid:PressureMinValid', 'B'), Action = B.properties_range_check)
+    assert(B.p <= B.p_max, message('physmod:simscape:library:two_phase_fluid:PressureMaxValid', 'B'), Action = B.properties_range_check)
+    assert(B.u >= B.u_min, message('physmod:simscape:library:two_phase_fluid:InternalEnergyMinValid', 'B'), Action = B.properties_range_check)
+    assert(B.u <= B.u_max, message('physmod:simscape:library:two_phase_fluid:InternalEnergyMaxValid', 'B'), Action = B.properties_range_check)
+    assert(p_I >= A.p_min, Action = A.properties_range_check)
+    assert(p_I <= A.p_max, Action = A.properties_range_check)
+    assert(u_I >= A.u_min, Action = A.properties_range_check)
+    assert(u_I <= A.u_max, Action = A.properties_range_check)
+end
+
+% Internal components that calculate energy convection at ports A and B
+components (ExternalAccess = none)
+    convection_A = foundation.two_phase_fluid.port_convection( ...
+        flow_area = area, ...
+        length_scale = if length <= 3*sqrt(4*area/pi), length else 3*sqrt(4*area/pi) end);
+    convection_B = foundation.two_phase_fluid.port_convection( ...
+        flow_area = area, ...
+        length_scale = if length <= 3*sqrt(4*area/pi), length else 3*sqrt(4*area/pi) end);
+end
+connections
+    connect(A, convection_A.port)
+    connect(B, convection_B.port)
+end
+
+% Equate variables for internal components that calculate energy convection at ports A and B
+equations
+    convection_A.mdot == mdot_A;
+    convection_A.Phi  == Phi_A;
+    convection_B.mdot == mdot_B;
+    convection_B.Phi  == Phi_B;
+
+    convection_A.ht_I == u_I + p_I*volume/mass + (mdot_A*length/mass)^2/2;
+    convection_B.ht_I == u_I + p_I*volume/mass + (mdot_B*length/mass)^2/2;
+end
+
+end
