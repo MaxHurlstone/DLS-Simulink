@@ -32,3 +32,6 @@ octave-workspace
 
 # Test generated library files
 DLS_Simscape_lib.slx
+
+# Development Simulink model
+dev.slx

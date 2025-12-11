@@ -13,22 +13,42 @@ annotations
 end
 
 parameters
-    k1 = {100, 'W/(m*K)'} % Conductivities material 1
-    k2 = {100, 'W/(m*K)'} % Condsuctivities material 2
+    k1      = {100,     'W/(m*K)'} % Conductivities material 1
+    k2      = {100,     'W/(m*K)'} % Conductivities material 2
 
-    s1 = {0.00001, 'm'} % Surface roughness material 1
-    s2 = {0.00001, 'm'} % Surface roughness material 2
+    E1      = {120,     'GPa'    } % Elastic Modulus 1
+    E2      = {120,     'GPa'    } % Elastic Modulus 2
 
-    vh1 = {150, '1'} % Vickers hardness material 1
-    vh2 = {150, '1'} % Vickers hardness material 2
+    nu1      = {0.3,     '1'    } % Poisson's Ratio 1
+    nu2      = {0.3,     '1'    } % Poisson's Ratio 2
 
-    Fc = {200, 'N'} % Contact force
-    Ac = {1, 'm^2'} % Contact area
+
+    s1      = {0.00001, 'm'      } % Surface roughness material 1
+    s2      = {0.00001, 'm'      } % Surface roughness material 2
+
+    vh1     = {150,     '1'      } % Vickers hardness material 1
+    vh2     = {150,     '1'      } % Vickers hardness material 2
+
+    Fc      = {200,     'N'      } % Contact force
+    Ac      = {1,       'm^2'    } % Contact area
+
+    plastic = false;               % Enable plastic contact
+end
+
+% Parameter groups
+annotations
+    UILayout = [
+    UIGroup('Contact', Fc, Ac, plastic)
+    UIGroup('Material 1', k1, E1, nu1, s1, vh1)
+    UIGroup('Material 2', k2, E2, nu2, s2, vh2)]
 end
 
 parameters (Access = private)
     % Harmonic mean of contacting surface conductivities
     k_hm = (2*k1*k2)/(k1+k2);
+
+    % Find effective Elastic modulus
+    Ep = (E1*E2)/((E2*(1-nu1^2))+E1*(1-nu2^2));
 
     % Asperity RMS average height
     s_asp = sqrt(s1^2 + s2^2);
@@ -58,9 +78,20 @@ parameters (Access = private)
     % Calculate pressure
     p = Fc/Ac;
 
+end
+
+if ~plastic
+intermediates (Access = private, ExternalAccess = none)
+    % Use Mikic model
+    h = 1/9*k_hm*(1/s_asp)*((p/Ep)^0.94)
+    resistance = 1/(h*Ac);
+end
+else
+intermediates
     % Calculate Cooper-Mikic-Yovanovich (CMY) Correlation
     h = 1.25*k_hm*(m_asp/s_asp)*((p/Hc)^0.95);
     resistance = 1/(h*Ac);
+end
 end
 
 equations
