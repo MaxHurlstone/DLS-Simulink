@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:d="http://www.mathworks.com/blockgraphics" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="svg_3" width="400" height="380" d:options="Foreground:PortStyled;Background:Transparent;StrokeScaling:PortStyled;StrokeScalingOnResize:NonScaling;LineExtension:On;Rotate:On;Resize:FitToBlock;Frame:Off;Clipping:None;PreAdjustStrokeWidth:Normalized;Port:Auto Majority;">
+	<g id="layer_5" title="layer_0" ie-ports="left:foundation-thermal-thermal,top:,right:,bottom:">
+		<g id="group">
+			<path id="line_73" class="path" d:options="ClosedShapeFill:On;Port:L0;" d=" M 134,25 L 334,25 Q 345.25,31.11 351.5,71.53 C 355.83,99.58 359,161.95 359,190 C 359,218.05 355.83,283.06 351.5,311.11 Q 345.25,351.54 334,355 L 134,355"/>
+			<ellipse id="ellipse_49" class="ellipse" d:options="ClosedShapeFill:On;Port:L0;" cx="134" cy="190" rx="25" ry="165"/>
+			<line id="line_17" class="line" d:options="Port:L0;" x1="0" y1="190" x2="109" y2="190"/>
+		</g>
+		<g id="group_1" d:options="Port:L0;">
+			<line id="line" class="line" transform="matrix(0.7071067812,-0.7071067812,0.7071067812,0.7071067812,-57.9854488033,240.0307320919)" x1="260.75" y1="274.51" x2="260.75" y2="105.51"/>
+			<line id="line_14" class="line" transform="matrix(0,1,-1,0,349.6249999999,-52.3649902344)" x1="219.37" y1="148.63" x2="182.62" y2="148.63"/>
+			<line id="line_29" class="line" transform="matrix(0,1,-1,0,348.5050048827,-87.9949951172)" x1="218.25" y1="113" x2="218.25" y2="147.51"/>
+		</g>
+	</g>
+</svg>

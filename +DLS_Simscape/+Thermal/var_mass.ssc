@@ -1,0 +1,61 @@
+component var_mass
+% Variable Cp Thermal Mass
+% This block models internal energy storage in a thermal network. The rate
+% of temperature increase is proportional to the heat flow rate into the
+% material and inversely proportional to the mass and specific heat of the
+% material. The mass of the block can be constant or variable. If the mass 
+% is variable, specify the change in mass using the physical input signal
+% at port Mdot. When using variable mass, you must also specify the 
+% temperature of incoming mass using the phsical input signal at port 
+% Tin. The temperature at port Tin only affects the results if the mass 
+% is increasing. If the mass is constant or decreasing, the temperature at 
+% port Tin has no effect.
+
+% Copyright 2005-2022 The MathWorks, Inc.
+
+nodes
+    M = foundation.thermal.thermal; % :top
+end
+
+inputs(ExternalAccess = none)
+    T_in = {300, 'K'};       % Tin:bottom
+end
+
+parameters
+    mass           = {1,                 'kg'};       % Mass
+    tvec           = {[273 433 573],     'K'}         % Temperature vector
+    sp_heat_vec    = {[4210 4330 5750],  'J/(kg*K)'}; % Specific heat
+end
+
+parameters (ExternalAccess = none)
+    mass_min  = {1e-6,'kg'};    % Minimum mass
+end
+
+variables
+    % Differential variables
+    T = {value = {300, 'K'}, priority = priority.high}; % Temperature
+
+    Q = {0, 'W'}; % Heat flow rate
+end
+
+branches
+    Q : M.Q -> *;
+end
+
+equations
+    assert(sp_heat > 0)
+    assert(T > 0, 'Temperature must be greater than absolute zero')
+
+    T == M.T;
+end
+
+intermediates (Access = private, ExternalAccess = none)
+    sp_heat = tablelookup(tvec, sp_heat_vec, T,  interpolation = linear, extrapolation = nearest);
+end
+
+equations
+    assert(mass > 0)
+    Q == mass*sp_heat*T.der;
+end
+
+end
