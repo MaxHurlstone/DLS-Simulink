@@ -6,3 +6,4 @@
 .gitignore export-ignore
 .gitattributes export-ignore
 /+DLS_Simscape export-ignore
+initlib.m export-ignore
