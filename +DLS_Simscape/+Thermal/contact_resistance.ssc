@@ -19,8 +19,8 @@ parameters
     E1      = {120,     'GPa'    } % Elastic Modulus 1
     E2      = {120,     'GPa'    } % Elastic Modulus 2
 
-    nu1      = {0.3,     '1'    } % Poisson's Ratio 1
-    nu2      = {0.3,     '1'    } % Poisson's Ratio 2
+    nu1      = {0.3,     '1'     } % Poisson's Ratio 1
+    nu2      = {0.3,     '1'     } % Poisson's Ratio 2
 
 
     s1      = {0.00001, 'm'      } % Surface roughness material 1

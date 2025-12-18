@@ -50,7 +50,7 @@ equations
 end
 
 intermediates (Access = private, ExternalAccess = none)
-    sp_heat = tablelookup(tvec, sp_heat_vec, T,  interpolation = linear, extrapolation = nearest);
+    sp_heat = tablelookup(tvec, sp_heat_vec, T,  interpolation = smooth, extrapolation = nearest);
 end
 
 equations

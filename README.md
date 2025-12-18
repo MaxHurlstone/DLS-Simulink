@@ -6,9 +6,9 @@ Please see the [Confluence page](https://confluence.diamond.ac.uk/display/EDG/DL
 
 ## Contributing
 
-Anyone is open to download releases of this library and use it in the MATLAB modelling!
+Anyone is open to download releases of this library and use it in their MATLAB modelling!
 
-Maybe you have some ideas for a custom Simscape component? Or maybe you have done some work recently that you think should be used as a template? If anyone is interested in contributing to this project, [email me](max.hurlstone@diamond.ac.uk)!. 
+Maybe you have some ideas for a custom Simscape component? Or maybe you have done some work recently that you think should be used as a template? If anyone is interested in contributing to this project, [email me](max.hurlstone@diamond.ac.uk)! 
 
 ## License
 For open source projects, say how it is licensed.
