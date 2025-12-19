@@ -15,63 +15,60 @@ annotations
 end
 
 parameters
-    k1      = {100,     'W/(m*K)'} % Conductivities material 1
-    k2      = {100,     'W/(m*K)'} % Conductivities material 2
+
+    tvec    = {[100 150 300], 'K'} % Temperature vector
+
+    k1      = {[100 100 100],     'W/(m*K)'} % Conductivities material 1
+    k2      = {[100 100 100],     'W/(m*K)'} % Conductivities material 2
 
     E1      = {120,     'GPa'    } % Elastic Modulus 1
     E2      = {120,     'GPa'    } % Elastic Modulus 2
 
-    nu1      = {0.3,     '1'     } % Poisson's Ratio 1
-    nu2      = {0.3,     '1'     } % Poisson's Ratio 2
+    nu1     = {0.3,     '1'     } % Poisson's Ratio 1
+    nu2     = {0.3,     '1'     } % Poisson's Ratio 2
 
+    ra1      = {0.000001, 'm'      } % Avg. surface roughness material 1
+    ra2      = {0.000001, 'm'      } % Avg. surface roughness material 2
 
-    s1      = {0.00001, 'm'      } % Surface roughness material 1
-    s2      = {0.00001, 'm'      } % Surface roughness material 2
+    vh1     = {150,     '1'      } % Vicker's hardness material 1
+    vh2     = {150,     '1'      } % Vicker's hardness material 2
 
-    vh1     = {150,     '1'      } % Vickers hardness material 1
-    vh2     = {150,     '1'      } % Vickers hardness material 2
+    Nb   = {1, '1'} % Number of bolts
+    db   = {6, 'mm'} % Bolt minor diameter
+    Eb   = {200, 'GPa'} % Bolt Young's Modulus
+    Pb   = {2500, 'N'} % Bolt Preload
+    a_eff = {[0.01 0.01 0.01], '1'} % Percentage 
 
-    Fc      = {200,     'N'      } % Contact force
     Ac      = {1,       'm^2'    } % Contact area
-
-    plastic = false;               % Enable plastic contact
 end
 
 % Parameter groups
 annotations
     UILayout = [
-    UIGroup('Contact', Fc, Ac, plastic)
+    UIGroup('Joint setup', Nb, db, Eb, Pb, Ac)
     UIGroup('Material 1', k1, E1, nu1, s1, vh1)
     UIGroup('Material 2', k2, E2, nu2, s2, vh2)]
 end
 
 parameters (Access = private)
+
     % Harmonic mean of contacting surface conductivities
     k_hm = (2*k1*k2)/(k1+k2);
 
     % Find effective Elastic modulus
     Ep = (E1*E2)/((E2*(1-nu1^2))+E1*(1-nu2^2));
 
-    % Asperity RMS average height
-    s_asp = sqrt(s1^2 + s2^2);
+    % Find rms surface roughness
+    s1 = sqrt(pi/2)*ra1;
+    s2 = sqrt(pi/2)*ra2;
 
-    m_unit = {1, 'm'};
+    % Use Lambert and Fletcher correlation to find slope
+    m1 = 0.076*(s1^0.52);
+    m2 = 0.076*(s2^0.52);
 
-    s1m = {...
-    if gt(s1, {0.000002, 'm'}), ...
-        0.152*((s1/m_unit)*10^6)^0.4 ...
-    else ...
-        0.124*((s1/m_unit)*10^6)^0.743 ...
-    end, '1'};
-    
-    s2m = {...
-    if gt(s2, {0.000002, 'm'}), ...
-        0.152*((s2/m_unit)*10^6)^0.4 ...
-    else ...
-        0.124*((s2/m_unit)*10^6)^0.743 ...
-    end, '1'};
-
-    m_asp = sqrt(s1m^2 + s2m^2);
+    % Calculate equivalent roughness and slope
+    s_eq = hypot(s1,s2);
+    m_eq = hypot(m1,m2);
 
     % Find softer material, then find its microhardness
     vh_soft = min([vh1, vh2]);
@@ -79,6 +76,8 @@ parameters (Access = private)
 
     % Calculate pressure
     p = Fc/Ac;
+
+    plastic = 1;
 
 end
 
