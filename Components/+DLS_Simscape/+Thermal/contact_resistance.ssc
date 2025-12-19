@@ -6,6 +6,8 @@ component contact_resistance < foundation.thermal.branch
 % Cooper-Mikic-Yovanovich (CMY) correlation, which is valid for isotropic rough
 % surfaces, assuming plastic deformation of surface asperities.
 
+% Max Hurlstone 12-2025
+
 % Custom component modified from resistance.ssc
  
 annotations

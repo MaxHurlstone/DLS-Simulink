@@ -3,15 +3,11 @@ component var_mass
 % This block models internal energy storage in a thermal network. The rate
 % of temperature increase is proportional to the heat flow rate into the
 % material and inversely proportional to the mass and specific heat of the
-% material. The mass of the block can be constant or variable. If the mass 
-% is variable, specify the change in mass using the physical input signal
-% at port Mdot. When using variable mass, you must also specify the 
-% temperature of incoming mass using the phsical input signal at port 
-% Tin. The temperature at port Tin only affects the results if the mass 
-% is increasing. If the mass is constant or decreasing, the temperature at 
-% port Tin has no effect.
+% material. This block can handle temperature varying specific heat capacity.
 
-% Copyright 2005-2022 The MathWorks, Inc.
+% Max Hurlstone 12-2025
+
+% Custom component modified from mass.ssc
 
 nodes
     M = foundation.thermal.thermal; % :top

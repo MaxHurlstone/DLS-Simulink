@@ -7,3 +7,6 @@
 .gitattributes export-ignore
 /+DLS_Simscape export-ignore
 initlib.m export-ignore
+/dev export-ignore
+/resources export-ignore
+dls-simulink.prj export ignore

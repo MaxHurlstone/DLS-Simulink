@@ -11,3 +11,6 @@ fileattrib('DLS_Simscape_lib.slx', '+w')
 
 % Save library
 save_system("DLS_Simscape_lib");
+
+% Move library to Library folder
+movefile('DLS_Simscape_lib.slx', '../Library/DLS_Simscape_lib.slx')
