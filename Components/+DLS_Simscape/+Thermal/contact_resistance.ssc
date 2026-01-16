@@ -9,7 +9,7 @@ component contact_resistance < foundation.thermal.branch
 % Max Hurlstone 12-2025
 
 % Custom component modified from resistance.ssc
- 
+
 annotations
     Icon = 'contact_resistance.svg';
 end
@@ -18,8 +18,8 @@ parameters
 
     tvec    = {[100 150 300], 'K'} % Temperature vector
 
-    k1      = {[100 100 100],     'W/(m*K)'} % Conductivities material 1
-    k2      = {[100 100 100],     'W/(m*K)'} % Conductivities material 2
+    k1vec   = {[100 100 100],     'W/(m*K)'} % Conductivities material 1
+    k2vec   = {[100 100 100],     'W/(m*K)'} % Conductivities material 2
 
     E1      = {120,     'GPa'    } % Elastic Modulus 1
     E2      = {120,     'GPa'    } % Elastic Modulus 2
@@ -27,73 +27,85 @@ parameters
     nu1     = {0.3,     '1'     } % Poisson's Ratio 1
     nu2     = {0.3,     '1'     } % Poisson's Ratio 2
 
-    ra1      = {0.000001, 'm'      } % Avg. surface roughness material 1
-    ra2      = {0.000001, 'm'      } % Avg. surface roughness material 2
+    ra1     = {0.000001, 'm'      } % Avg. surface roughness material 1
+    ra2     = {0.000001, 'm'      } % Avg. surface roughness material 2
 
     vh1     = {150,     '1'      } % Vicker's hardness material 1
     vh2     = {150,     '1'      } % Vicker's hardness material 2
 
-    Nb   = {1, '1'} % Number of bolts
-    db   = {6, 'mm'} % Bolt minor diameter
-    Eb   = {200, 'GPa'} % Bolt Young's Modulus
-    Pb   = {2500, 'N'} % Bolt Preload
-    a_eff = {[0.01 0.01 0.01], '1'} % Percentage 
-
+    Fj      = {2500, 'N'} % Joint preload
+    kj      = {200, 'N/m'} % Joint stiffness
     Ac      = {1,       'm^2'    } % Contact area
+    alphaj  = {0, '1'} % Coefficient of Thermal Expansion (%)
+    Tref    = {300, 'K'} % Thermal expansion reference temperature
+    
 end
 
 % Parameter groups
 annotations
     UILayout = [
-    UIGroup('Joint setup', Nb, db, Eb, Pb, Ac)
-    UIGroup('Material 1', k1, E1, nu1, s1, vh1)
-    UIGroup('Material 2', k2, E2, nu2, s2, vh2)]
+    UIGroup('Lookup temperatures', tvec)
+    UIGroup('Joint setup', Fj, kj, Ac, alphaj, Tref)
+    UIGroup('Material 1', k1vec, E1, nu1, ra1, vh1)
+    UIGroup('Material 2', k2vec, E2, nu2, ra2, vh2)]
 end
 
 parameters (Access = private)
+    % Factor to adjust units of Lambert Fletcher correlation
+    f = {1e-6, 'm'};
+end
+
+intermediates (Access = private, ExternalAccess = none)
+
+    % Tablelookup temp dependent conductivity
+    avg_factor = 0.5;
+    T_avg = T*avg_factor + B.T;
+    k1 = tablelookup(tvec, k1vec, T_avg,  interpolation = smooth, extrapolation = nearest);
+    k2 = tablelookup(tvec, k2vec, T_avg,  interpolation = smooth, extrapolation = nearest);
 
     % Harmonic mean of contacting surface conductivities
     k_hm = (2*k1*k2)/(k1+k2);
-
-    % Find effective Elastic modulus
-    Ep = (E1*E2)/((E2*(1-nu1^2))+E1*(1-nu2^2));
 
     % Find rms surface roughness
     s1 = sqrt(pi/2)*ra1;
     s2 = sqrt(pi/2)*ra2;
 
     % Use Lambert and Fletcher correlation to find slope
-    m1 = 0.076*(s1^0.52);
-    m2 = 0.076*(s2^0.52);
+    m1 = 0.076*((s1/f)^0.52);
+    m2 = 0.076*((s2/f)^0.52);
 
     % Calculate equivalent roughness and slope
-    s_eq = hypot(s1,s2);
-    m_eq = hypot(m1,m2);
+    s_eq = sqrt(s1^2 + s2^2); %hypot(s1,s2);
+    m_eq = sqrt(m1^2 + m2^2); %hypot(m1,m2);
+
+    % Find effective Elastic modulus
+    Ep = (E1*E2)/((E2*(1-nu1^2))+E1*(1-nu2^2));
 
     % Find softer material, then find its microhardness
     vh_soft = min([vh1, vh2]);
     Hc = {vh_soft*9810000, 'Pa'};
 
     % Calculate pressure
-    p = Fc/Ac;
-
-    plastic = 1;
+    p = Fj/Ac;
 
 end
 
-if ~plastic
-intermediates (Access = private, ExternalAccess = none)
-    % Use Mikic model
-    h = 1/9*k_hm*(1/s_asp)*((p/Ep)^0.94)
-    resistance = 1/(h*Ac);
-end
-else
+% UNCOMMENTED AS ELASTIC CONTACT NOT YET IMPLEMENTED
+% if ~plastic
+% intermediates (Access = private, ExternalAccess = none)
+%     % Use Mikic model
+%     h = 1/9*k_hm*(1/s_eq)*((p/Ep)^0.94)
+%     resistance = 1/(h*Ac);
+% end
+% else
+
 intermediates
     % Calculate Cooper-Mikic-Yovanovich (CMY) Correlation
-    h = 1.25*k_hm*(m_asp/s_asp)*((p/Hc)^0.95);
+    h = 1.25*k_hm*(m_eq/s_eq)*((p/Hc)^0.95);
     resistance = 1/(h*Ac);
 end
-end
+
+% end
 
 equations
     assert(resistance >= 0)

@@ -1,0 +1,30 @@
+component oscillating_translational_reference
+
+annotations
+    Icon = 'oscillating_translational_reference.svg';
+end
+
+nodes
+    V = foundation.mechanical.translational.translational; % :top
+end
+
+parameters
+    A = {1,  'm'};  % Oscillation amplitude
+    w = {300, 'rad/s'}; % Oscillation frequency
+end
+
+variables(Access = protected)
+    x = { 0, 'm'};     % Position
+    f = { 0, 'N' };     % Force
+end
+
+branches
+    f : V.f -> *;
+end    
+
+equations  
+    x == A*cos(w*time);
+    V.v == x.der;
+end    
+
+end
