@@ -12,10 +12,10 @@ tidyUp = onCleanup(@() cd(currFolder));
 projRoot = currentProject().RootFolder;
 
 % CD to folder containing custom components
-cd(fullfile(projRoot, "tbx", "ecsl", "components"));
+cd(fullfile(projRoot, "tbx", "csl", "components"));
 
 % Create full path of library file
-libraryFileName = fullfile(projRoot, "tbx", "ecsl", "library", "DLS_Simscape");
+libraryFileName = fullfile(projRoot, "tbx", "csl", "library", "DLS_Simscape");
 
 % Build library
 sscbuild("DLS_Simscape", "-output", libraryFileName);
