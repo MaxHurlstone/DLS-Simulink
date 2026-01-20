@@ -34,10 +34,7 @@ parameters
     vh2     = {150,     '1'      } % Vicker's hardness material 2
 
     Fj      = {2500, 'N'} % Joint preload
-    kj      = {200, 'N/m'} % Joint stiffness
     Ac      = {1,       'm^2'    } % Contact area
-    alphaj  = {0, '1'} % Coefficient of Thermal Expansion (%)
-    Tref    = {300, 'K'} % Thermal expansion reference temperature
     
 end
 
@@ -45,7 +42,7 @@ end
 annotations
     UILayout = [
     UIGroup('Lookup temperatures', tvec)
-    UIGroup('Joint setup', Fj, kj, Ac, alphaj, Tref)
+    UIGroup('Joint setup', Fj, Ac)
     UIGroup('Material 1', k1vec, E1, nu1, ra1, vh1)
     UIGroup('Material 2', k2vec, E2, nu2, ra2, vh2)]
 end
