@@ -26,7 +26,7 @@ function archiveTask(~)
 
 projectRoot = currentProject().RootFolder;
 
-toolboxFolder = fullfile(projectRoot, "tbx");
+toolboxFolder = fullfile(projectRoot, "toolbox");
 myUUID = "f1be6fd5-7861-44c4-bfec-a98ded851b12";
 opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, myUUID);
 
@@ -35,13 +35,13 @@ opts.AuthorName = "Maxime Hurlstone";
 opts.AuthorEmail = "max.hurlstone@diamond.ac.uk";
 opts.ToolboxName = "DLS Simscape Library";
 opts.ToolboxVersion = ver("csl").Version; % this relies on you have a Content.m file
-mltbxFileName = 'DLS_Simscape.mltbx';
+mltbxFileName = 'dlsimscape toolbox.mltbx';
 opts.OutputFile = fullfile(projectRoot, 'releases', mltbxFileName);
 opts.MinimumMatlabRelease = "R2024a";
-opts.ToolboxImageFile = "DLS_Simulink.png";
+opts.ToolboxImageFile = "./images/dlsimulink.png";
 
 % Set up what should be on the path
-toAddToPath = genpath( fullfile(projectRoot, "tbx") );
+toAddToPath = genpath( fullfile(projectRoot, "toolbox") );
 toAddToPath = string( split(toAddToPath(1:end-1), ";") );
 opts.ToolboxMatlabPath = toAddToPath;
 
