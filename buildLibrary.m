@@ -18,4 +18,4 @@ cd(fullfile(projRoot, "toolbox", "csl", "components"));
 libraryFileName = fullfile(projRoot, "toolbox", "csl", "library", "DLSimscape");
 
 % Build library
-sscbuild("DLS_Simscape", "-output", libraryFileName);
+sscbuild("DLSimscape", "-output", libraryFileName);
