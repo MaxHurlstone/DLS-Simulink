@@ -29,6 +29,9 @@ codegen/
 # Dev folders
 /dev
 
+# ShapeIt folder
+/dlshapeit
+
 # Cache files
 *.slxc
 
