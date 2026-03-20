@@ -7,7 +7,7 @@ arguments (Input)
 end
 
 matspec = split(matname,"_");
-matpath = pwd + "\Materials\" + matspec(1) + "\" + matname + ".csv";
+matpath = "\Materials\" + matspec(1) + "\" + matname + ".csv";
 
 opts = delimitedTextImportOptions;
 opts.DataLines = [1 6];
