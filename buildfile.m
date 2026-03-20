@@ -33,9 +33,9 @@ opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, myUUID);
 % Required options
 opts.AuthorName = "Maxime Hurlstone";
 opts.AuthorEmail = "max.hurlstone@diamond.ac.uk";
-opts.ToolboxName = "DLS Simscape Library";
-opts.ToolboxVersion = ver("csl").Version; % this relies on you have a Content.m file
-mltbxFileName = 'dlsimscape toolbox.mltbx';
+opts.ToolboxName = "DLSimscape";
+opts.ToolboxVersion = ver("toolbox").Version; % this relies on you have a Content.m file
+mltbxFileName = 'dlsimscape.mltbx';
 opts.OutputFile = fullfile(projectRoot, 'releases', mltbxFileName);
 opts.MinimumMatlabRelease = "R2024a";
 opts.ToolboxImageFile = "./images/dlsimulink.png";

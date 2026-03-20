@@ -15,7 +15,7 @@ projRoot = currentProject().RootFolder;
 cd(fullfile(projRoot, "toolbox", "csl", "components"));
 
 % Create full path of library file
-libraryFileName = fullfile(projRoot, "toolbox", "csl", "library", "DLS_Simscape");
+libraryFileName = fullfile(projRoot, "toolbox", "csl", "library", "DLSimscape");
 
 % Build library
 sscbuild("DLS_Simscape", "-output", libraryFileName);
