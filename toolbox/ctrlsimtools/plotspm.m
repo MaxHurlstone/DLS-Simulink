@@ -3,13 +3,7 @@ function plotspm(system)
 
 fprintf('Loading bodeplot of system...\n')
 
-plopts = bodeoptions;
-plopts.FreqUnits = 'Hz';
-plopts.PhaseVisible = 'off';
-
 figure()
-bodeplot(system,plopts)
-xlim([0.1 10000])
-grid on
+bodeplot(system,bodeopts())
 
 end

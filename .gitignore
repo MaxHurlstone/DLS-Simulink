@@ -26,15 +26,6 @@ slprj/
 sccprj/
 codegen/
 
-# Dev folders
-/dev
-
-# ShapeIt folder (for now)
-/toolbox/dlshapeit
-
-# DEB folder (for now)
-/toolbox/deb
-
 # Cache files
 *.slxc
 
