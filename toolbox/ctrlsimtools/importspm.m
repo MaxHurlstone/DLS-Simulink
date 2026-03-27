@@ -1,11 +1,15 @@
-function importspm(doplot, Norder)
+function system = importspm(doplot, Norder)
 %IMPORTSPM Import spm file into a MATLAB state space
 %   New (and hopefully improved) function that allows a user to import an
 %   spm file into a state space in their base workspace.
 
-arguments
+arguments (Input)
     doplot (1,1) logical = 0
     Norder (1,1) int32 = 0
+end
+
+arguments (Output)
+    system(:,:) ss
 end
 
 %% Load file
@@ -79,10 +83,7 @@ outputs = repelem(linarr(idxo+1:idxo+p),3);
 
 y = strcat(outputs,ids);
 
-%% Create state space 
-
-% Clear existing system
-clear system
+%% Create state space
 
 % Create state space
 system = ss(A,B,C,D);
@@ -99,8 +100,7 @@ else
 end
 
 % Assign to workspace
-fprintf('State space generated and saved to base workspace.\n')
-assignin('base','system',system)
+fprintf('State space generated.\n')
 
 if doplot
     plotspm(system)
