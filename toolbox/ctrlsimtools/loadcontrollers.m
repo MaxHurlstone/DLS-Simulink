@@ -1,6 +1,11 @@
 function loadcontrollers()
-%LOADCONTROLLERS Summary of this function goes here
-%   Detailed explanation goes here
+%LOADCONTROLLERS Loads Shapeit controllers
+%   Loads controllers designed in Shapeit. When prompted, select a file.
+%   This function imports all Shapeit controllers in that directory into
+%   the MATLAB workspace. These controllers can then be accessed in
+%   Simulink, for example.
+%
+%   DLSimulink Toolbox
 
 %% Load file
 [~,location] = uigetfile('.mat');

@@ -1,7 +1,17 @@
 function system = importspm(doplot, Norder)
-%IMPORTSPM Import spm file into a MATLAB state space
-%   New (and hopefully improved) function that allows a user to import an
-%   spm file into a state space in their base workspace.
+%IMPORTSPM Import ANSYS spm
+%   Import an ANSYS .spm file into a MATLAB state space variable.
+%
+%   Inputs:
+%   doplot - Configure if bode plot is generated, boolean (default 0)
+%   Norder - Order of reduced order model, integer (default 0)
+%
+%   Outputs:
+%   system - MATLAB state space
+%
+%   See also SISOTF, PLOTSPM
+%
+%   DLSimulink Toolbox
 
 arguments (Input)
     doplot (1,1) logical = 0
@@ -9,7 +19,7 @@ arguments (Input)
 end
 
 arguments (Output)
-    system(:,:) ss
+    system (:,:) ss
 end
 
 %% Load file
