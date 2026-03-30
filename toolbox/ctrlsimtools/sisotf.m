@@ -1,6 +1,21 @@
-function [sysio,sysin] = sisotf(system,Ni,No,kext,ts)
-%SISOTF Summary of this function goes here
-%   Detailed explanation goes here
+function sysio = sisotf(system,Ni,No,kext,ts)
+%SISOTF Extract SISO from MIMO system
+%   Extract SISO system from selected input to selected output, apply
+%   gains, and discretise system using a ZOH equivalent Pade approximation.
+%
+%   Inputs:
+%   system - Input MIMO system, ss
+%   Ni     - Input variable index, integer
+%   No     - Output variable index, integer
+%   kext   - External gains, double
+%   ts     - System sample time / hardware control rate, double
+%
+%   Outputs:
+%   sysio  - Output SISO system
+%
+%   See also IMPORTSPM, PLOTSPM
+%
+%   DLSimulink Toolbox
 
 arguments (Input)
     system (:,:) ss
@@ -12,7 +27,6 @@ end
 
 arguments (Output)
     sysio (1,1) ss
-    sysin (1,1) ss
 end
 
 % Extract I/O pair  

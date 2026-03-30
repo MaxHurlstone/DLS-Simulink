@@ -1,6 +1,7 @@
 function [plopts] = bodeopts()
-%BODEOPTS Summary of this function goes here
-%   Detailed explanation goes here
+%BODEOPTS Sets bodeplot options for DLSimulink
+%
+%   DLSimulink Toolbox
 
 plopts = bodeoptions;
 plopts.FreqUnits = 'Hz';
