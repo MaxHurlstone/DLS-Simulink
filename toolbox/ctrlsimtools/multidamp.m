@@ -1,40 +1,48 @@
-function system = multidamp(system, modes, multiplications)
+function [system,Amult] = multidamp(sysin, modes, multipliers)
 %MULTIDAMP Modify system damping ratios
 %   Modify a system's damping ratios by a set factor. Feed the function the 
-% state space system you want to affect, a list of modes and a list of 
-% multipliers for each mode. This function then consecutively takes each
-% mode and multiplies that mode's damping by a corresponding multiplier. 
+%   state space system you want to affect, a list of modes and a list of 
+%   multipliers for each mode. This function then consecutively takes each
+%   mode and multiplies that mode's damping by a corresponding multiplier. 
 %
 %   Inputs:
 %   system - input state space, ss
 %   modes - modes to edit, array
-%   multiplications - factors to edit modes by, array
+%   multipliers - factors to edit modes by, array
 %
 %   Outputs:
 %   system
-%
-%   Example:
-%       modes = [2,3]
-%       multipliers = [2,0.5]
-%       system = multidamp(system, modes, multipliers)
+%   Amult
 %
 %   See also SISOTF, PLOTSPM
 %
 %   DLSimulink Toolbox
 
-% Number of rows and columns in A matrix
-rows = length(system.A);
-columns = height(system.A);
+arguments (Input)
+    sysin (:,:) ss
+    modes (:,1) int32
+    multipliers (:,1) double
+end 
 
-% Loop through modes to edit
-for count = 1:length(modes)
+arguments (Output)
+    system (:,:) ss
+    Amult (:,:) double
+end  
 
-    % Get row and column index
-    rowIndex = rows/2+mode(count);
-    columnIndex = columns/2+mode(count);
+% Set system to current system
+system = sysin;
 
-    % Edit modes
-    system.A(rowIndex,columnIndex) = system.A(rowIndex,columnIndex)*multiplications(count) ;
-end
+% Get number of modes
+Nm = size(system.A,1)/2;
+
+% Create vector for diagonal with multipliers at mode positions
+vmult = ones(1,Nm);
+vmult(modes) = multipliers;
+
+% Assign vector to diagonal matrix
+Amult = diag(vmult);
+
+% Element-wise multiply original A matrix with multiplier matrix
+system.A(Nm+1:end,Nm+1:end) = sysin.A(Nm+1:end,Nm+1:end).*Amult;
 
 end
