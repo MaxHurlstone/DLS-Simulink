@@ -1,4 +1,4 @@
-function system = importspm(doplot, Norder)
+function system = importspm(Norder, doplot, file)
 %IMPORTSPM Import ANSYS spm
 %   Import an ANSYS .spm file into a MATLAB state space variable.
 %
@@ -14,8 +14,9 @@ function system = importspm(doplot, Norder)
 %   DLSimulink Toolbox
 
 arguments (Input)
-    doplot (1,1) logical = 0
     Norder (1,1) int32 = 0
+    doplot (1,1) logical = 0
+    file (1,1) string = ""
 end
 
 arguments (Output)
@@ -23,7 +24,11 @@ arguments (Output)
 end
 
 %% Load file
-[file,location] = uigetfile('.spm');
+if file == ""
+    [file,location] = uigetfile('.spm');
+else
+    location = "./SPMs/";
+end
 
 linarr = strip(readlines(fullfile(location,file)));
 
