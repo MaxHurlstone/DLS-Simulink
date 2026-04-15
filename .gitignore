@@ -16,7 +16,7 @@
 # *.mltbx
 
 # Project folder
-resources/
+resources/project
 
 # Deployable archives
 *.ctf
