@@ -15,6 +15,9 @@
 # *.mlappinstall
 # *.mltbx
 
+# Project folder
+
+resources/
 # Deployable archives
 *.ctf
 
