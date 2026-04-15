@@ -18,7 +18,6 @@
 # Project folder
 resources/
 
-resources/
 # Deployable archives
 *.ctf
 
