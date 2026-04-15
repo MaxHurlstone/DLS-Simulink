@@ -16,6 +16,7 @@
 # *.mltbx
 
 # Project folder
+resources/
 
 resources/
 # Deployable archives
