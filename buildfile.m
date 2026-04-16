@@ -37,7 +37,7 @@ opts.ToolboxName = "DLSimulink";
 opts.ToolboxVersion = ver("toolbox").Version; % this relies on you have a Content.m file
 mltbxFileName = 'dlsimulink.mltbx';
 opts.OutputFile = fullfile(projectRoot, 'releases', mltbxFileName);
-opts.MinimumMatlabRelease = "R2024a";
+opts.MinimumMatlabRelease = "R2025b";
 opts.ToolboxImageFile = "./images/dlsimulink.png";
 
 % Set up what should be on the path
