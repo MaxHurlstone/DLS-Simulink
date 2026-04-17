@@ -1,6 +1,15 @@
 function matcompare(varargin)
 %MATCOMPARE Compares material properties graphically
-%   Max Hurlstone 12-2025
+%   Takes input material data and plots it, to enable quick comparison of
+%   material properties.
+%
+%   Inputs:
+%   varargin - any quantity of valid material database names, string
+%
+%   See also READMDB, PRINTDB
+%
+%   DLSimulink Toolbox
+
 
 figure()
 
@@ -8,13 +17,7 @@ for i=1:length(varargin)
 
     matname = varargin{i};
 
-    matspec = split(matname,"_");
-    matpath = "\Materials\" + matspec(1) + "\" + matname + ".csv";
-    
-    opts = delimitedTextImportOptions;  
-    opts.DataLines = 6;
-    opts.VariableNames = {'T', 'k'};
-    Tdata = readtable(matpath,opts);
+    Tdata = readmdb(matname);
     
     x = Tdata{:,1};
     x = cell2mat(cellfun(@(x) str2double(x), x, 'UniformOutput', false));

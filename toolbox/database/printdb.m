@@ -1,8 +1,14 @@
 function printdb()
 %PRINTDB Prints materials in the database
-%   Max Hurlstone 12-2025
+%   Prints all materials in the database.
+%
+%   See also MATCOMPARE, PROPGEN
+%
+%   DLSimulink Toolbox
 
-tbl = struct2table(dir("\Materials\**"));
+fpath = fileparts(mfilename('fullpath'));
+
+tbl = struct2table(dir(fpath + "\Materials\**"));
 files = tbl(~tbl.isdir,:);
 
 fprintf('List of materials in database:\n')
