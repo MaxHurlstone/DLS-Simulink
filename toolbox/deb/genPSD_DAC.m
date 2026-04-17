@@ -1,15 +1,29 @@
 function PSD = genPSD_DAC(par)
+%GENPSD_DAC Generate DAC disturbance PSD model
+%   Generates PSD data for a DAC
+%
+%   Inputs:
+%   par - genPSD parameters, structure
+%
+%   Outputs:
+%   PSD - PSD data, array
+%
+%   See also RUNDEB
+%
+%   DLSimulink Toolbox
 
-%% Generate DAC disturbance PSD model
-%%
-output_range    = 20;                                          % Output range of DAC [V] 
-n_bit_DAC		= 16;                                          % DAC resolution in bits
-DAC_quant       = output_range/((2^n_bit_DAC)*sqrt(12));      % DAC quantisation noise
+% DAC parameters
+output_range    = par.dacrange;                             
+n_bit_DAC		= par.dacbits;                                     
 
-PSD_DAC         = bode(tf(1)*(DAC_quant^2/par.Fnyq), par.frq*2*pi);         % Check ^2 PSD of sensor white noise
-PSD_DAC         = PSD_DAC(:);                                               % Reformat array    
+% DAC quantisation noise
+DAC_quant       = output_range/((2^n_bit_DAC)*sqrt(12));      
 
-%%Plot PSD for DAC
+% Check ^2 PSD of sensor white noise and reformat
+PSD_DAC         = bode(tf(1)*(DAC_quant^2/par.Fnyq), par.frq*2*pi);  
+PSD_DAC         = PSD_DAC(:);  
+
+% Plot PSD for DAC
 figure;
 loglog(par.frq,PSD_DAC)
 hold on; grid

@@ -1,29 +1,78 @@
-function rundeb()
-%RUNDEB Summary of this function goes here
-%   Detailed explanation goes here
+function rundeb(outputID,Res,Fmin,Ts, dacrange, dacbits)
+%RUNDEB Runs a Dynamic Error Budget
+%   Runs a dynamic error budget, using the user selected linear system and
+%   disturbance data. If no disturbance data is selected, default data is
+%   used (data equivalent to that used in 2023 Maglev project).
+%
+%   Inputs:
+%
+%   Outputs:
+%
+%   see also DEBGUI
+%
+%   DLSimulink Toolbox
 
-debgui;
+arguments (Input)
+    outputID (1,1) int32 = 1
+    Res (1,1) double = 5000
+    Fmin (1,1) double = 0.1
+    Ts (1,1) double = 1/2000
+    dacrange (1,1) double = 20
+    dacbits (1,1) int32 = 16
+end
 
-%% Load linearised system model
-[file,location] = uigetfile('.mat');
+fig = uifigure;
+selection = uiconfirm(fig,"Please follow the instructions in the command terminal. Press OK to continue.","rundeb.m",'Icon','info');
+switch selection
+    case 'OK'
+        %
+    case 'Cancel'
+        return
+end
+close(fig);
+
+fprintf('1. Select your linear system model.\n\n')
+
+% Load linearised system model
+[file,location] = uigetfile('.mat', 'Select linear system model.');
 TransF    = load(fullfile(location,file));
 G_cLoop   = TransF.LinearAnalysisToolProject.Results.Data.Value;
-
-%% Analysis parameters
 N = size(G_cLoop.A,1);
 
-% Generate frequency grid
-par.Res     = Res;           % [-] Analysis resolution
-par.Fmin	= Fmin;			 % [Hz] bottom of analysis frequency range
-par.Ts		= Ts;            % [s] sample time of digital controller
-par.Fs		= 1/par.Ts;		 % [Hz] sample frequency
-par.Fnyq	= 1/(2*par.Ts);  % [Hz] nyquist frequency
-par.frq		= logspace(log10(par.Fmin),log10(par.Fnyq),par.Res)';
+% Set frequency paraeters
+par.Res      = Res;
+par.Fmin	 = Fmin;
+par.Ts		 = Ts;
+par.Fs		 = 1/par.Ts;
+par.Fnyq	 = 1/(2*par.Ts);
+par.frq		 = logspace(log10(par.Fmin),log10(par.Fnyq),par.Res)';
 
-%% Open disturbance data
+% Set DAC paraeters
+par.dacrange = dacrange;
+par.dacbits  =  dacbits;
 
-[file,location] = uigetfile('.csv','Select the data file for flrx');
-fname_flrx = fullfile(location,file);
+fprintf(['2. Select a disturbance .csv file in your disturbance directory.\n', ...
+         '   Note, the following conventions must be followed:\n', ...
+         '  - All disturbance data files must be in the same directory (the first selected file is used to collect the others)\n', ...
+         '  - All disturbance data must be saved as .csv files\n', ...
+         '  - All disturbance data must have a prefix identifying its type: amp_, floorx_, floory_, floorz_, sensor_\n\n'])
+
+% Open and import disturbance data
+
+[~,dfloc] = uigetfile('.csv','Select the a data file in your disturbance data directory.');
+
+tbl = struct2table(dir(dfloc));
+fulldids = tbl(~tbl.isdir,:).name;
+
+splitdids = split(fulldids,"_");
+dids = splitdids(:,1);
+
+PSD_DAC     = genPSD_DAC(dids{1},par);
+PSD_amp     = genPSD_import_amp(dids{1},fulldids,dfloc,par);
+PSD_flrX    = genPSD_import_flrX(dids{2},fulldids,dfloc,par);
+PSD_flrY    = genPSD_import_flrY(dids{3},fulldids,dfloc,par);
+PSD_flrZ    = genPSD_import_flrZ(dids{4},fulldids,dfloc,par);    
+PSD_sen     = genPSD_import_sen(dids{5},fulldids,dfloc,par);
 
 %% Format for ss from Simulink: flrx, flry, flrz, [amps (ACTUATOR_NUM)], [sens (ACTUATOR_NUM)], [DACs (ACTUATOR_NUM)]
 %% Extract and plot discrete transfer functions for each disturbance path
@@ -54,16 +103,6 @@ ylabel('Magnitude')
 title('Disturbance Path Transfer Function')
 xlim([par.Fmin, 1e+3])
 %ylim([1e-6, 1e+3])
-
-%% Import disturbance models 
-%%
-PSD_DAC     = genPSD_DAC(par);
-PSD_amp     = genPSD_import_amp(par);
-PSD_flrX    = genPSD_import_flrX(par);
-PSD_flrY    = genPSD_import_flrY(par);
-PSD_flrZ    = genPSD_import_flrZ(par);
-%PSD_flr_vel = PSD_flrX./((2*pi*par.frq).^2);           % convert Acceleration PSD to velocity PSD for Simulink vel block             
-PSD_sen     = genPSD_import_sen(par);
 
 %% Solve DEB
 %%

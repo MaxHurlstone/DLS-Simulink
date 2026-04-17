@@ -11,7 +11,8 @@ PSD_import_SFH9206 = interp1(data_frq, data_PSD, par.frq,'linear',0);         % 
 
 % Calculate signal power to test energy conservation
 CPS_Mapped = cps(PSD_import_SFH9206, par.frq);
-CPS_Import = cps(data_PSD, data_frq);
+idx        = find(data_frq > par.frq(end));
+CPS_Import = cps(data_PSD(1:idx(1)), data_frq(1:idx(1)));
 
 % Plot PSD for Floor vibrations
 figure;
