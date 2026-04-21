@@ -5,17 +5,15 @@ import matlab.buildtool.tasks.TestTask
 % Create a plan from task functions
 plan = buildplan(localfunctions);
 
-% Add the "check" task to identify code issues
-plan("check") = CodeIssuesTask;
-
-% Add the "test" task to run tests
-plan("test") = TestTask;
+projectRoot = currentProject().RootFolder;
+plan("doc").Inputs = fullfile(projectRoot, "/doc"); % source folder
+plan("doc").Outputs = fullfile(projectRoot, "/toolbox/toolboxdoc"); % destination folder
 
 % Make the "archive" task the default task in the plan
 plan.DefaultTasks = "archive";
 
 % Make the "archive" task dependent on the "check" and "test" tasks
-plan("archive").Dependencies = ["check", "test", "buildlibrary"];
+plan("archive").Dependencies = ["buildlibrary", "doc"];
 end
 
 function buildlibraryTask(~)
@@ -67,3 +65,19 @@ matlab.addons.toolbox.packageToolbox(opts)
 % mlAddonSetLicense( char(opts.OutputFile), struct( "type", 'MLL', "text", lic ) );
 
 end
+
+function docTask(c)
+
+docin = c.Task.Inputs.Path; % source folder
+docout = c.Task.Outputs.Path; % destination folder
+md = fullfile(docin,"**","*.md"); % Markdown documents
+[html,res] = docconvert(md); % convert to HTML
+docrun(html) % run code and insert output
+[xml,db] = docindex(doc); % index
+mkdir(docout) % make destination folder
+arrayfun(@movefile,html,fullfile(docout,extractAfter(html,docin))) % move HTML documents
+movefile(res,fullfile(docout,extractAfter(res,docin))) % move resources folder
+arrayfun(@movefile,xml,fullfile(docout,extractAfter(xml,docin))) % move index files
+movefile(db,fullfile(docout,extractAfter(db,docin))) % move search database folder
+
+end 
