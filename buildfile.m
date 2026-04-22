@@ -5,10 +5,6 @@ import matlab.buildtool.tasks.TestTask
 % Create a plan from task functions
 plan = buildplan(localfunctions);
 
-projectRoot = currentProject().RootFolder;
-plan("doc").Inputs = fullfile(projectRoot, "/doc"); % source folder
-plan("doc").Outputs = fullfile(projectRoot, "/toolbox/toolboxdoc"); % destination folder
-
 % Make the "archive" task the default task in the plan
 plan.DefaultTasks = "archive";
 
@@ -24,7 +20,7 @@ function archiveTask(~)
 
 projectRoot = currentProject().RootFolder;
 
-toolboxFolder = fullfile(projectRoot, "toolbox");
+toolboxFolder = fullfile(projectRoot, "toolbox", "dlsimulink");
 myUUID = "f1be6fd5-7861-44c4-bfec-a98ded851b12";
 opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, myUUID);
 
@@ -68,16 +64,35 @@ end
 
 function docTask(c)
 
-docin = c.Task.Inputs.Path; % source folder
-docout = c.Task.Outputs.Path; % destination folder
-md = fullfile(docin,"**","*.md"); % Markdown documents
-[html,res] = docconvert(md); % convert to HTML
-docrun(html) % run code and insert output
-[xml,db] = docindex(doc); % index
-mkdir(docout) % make destination folder
-arrayfun(@movefile,html,fullfile(docout,extractAfter(html,docin))) % move HTML documents
-movefile(res,fullfile(docout,extractAfter(res,docin))) % move resources folder
-arrayfun(@movefile,xml,fullfile(docout,extractAfter(xml,docin))) % move index files
-movefile(db,fullfile(docout,extractAfter(db,docin))) % move search database folder
+projectRoot = currentProject().RootFolder;
+
+toolboxFolder = fullfile(projectRoot, "toolbox", "/dlsimulink");
+toolboxdocFolder = fullfile(projectRoot, "toolbox", "/dlsimulinkdoc");
+
+% Get .m files in toolbox
+fprintf('Finding .m files...\n')
+listing = dir(fullfile(toolboxFolder, '**', '*.m'));
+N = length(listing);
+
+% Publish options
+options = struct('format','html' ...
+                 ,'outputDir',toolboxdocFolder ...
+                 ,'useNewFigure',false ...
+                 ,'evalCode',false ...
+                 ,'createThumbnail',false);
+
+fprintf('Found %u .m files.\n',N)
+
+% Clear old documentation
+fprintf('Deleting old documentation...\n')
+delete(fullfile(toolboxdocFolder,'*.html'))
+
+% Loop through .m files present and publish
+fprintf('Publishing code documentation to html...\n')
+for n=1:N
+    publish(fullfile(listing(n).folder,listing(n).name),options);
+end
+
+
 
 end 

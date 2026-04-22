@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding="utf-8"?>
+
+<toc version="2.0">
+<!-- First tocitem specifies top level in Help browser Contents pane -->
+<!-- This can be a roadmap page, as shown below, or a content page -->
+    <tocitem target="mytoolbox_product_page.html">DLSimulink Toolbox
+        <!-- Nest tocitems to create hierarchical entries in  Contents-->
+        <!-- To include icons, use the following syntax for tocitems: -->
+        <!-- <tocitem target="foo.html" image="HelpIcon.NAME"> -->
+        <!-- Title-of-Section </tocitem> -->
+        <!-- where NAME is one of the following (use capital letters): -->
+        <!-- FUNCTION, USER_GUIDE, EXAMPLES, BLOCK, GETTING_STARTED, -->
+        <!-- DEMOS, RELEASE_NOTES --> 
+        <!-- Icon images used for these entries are also stored in -->
+        <!-- matlabroot/toolbox/matlab/icons -->
+
+        <!-- Function reference next -->
+        <!-- First item is page describing function categories, if any -->
+        <tocitem target="helpfuncbycat.html" 
+                 image="HelpIcon.FUNCTION">Function Reference
+
+            <tocitem target="helpfuncbycat.html#1">ctrlsimtools
+                <tocitem target="bodeopts.html">bodeopts</tocitem>
+                <tocitem target="importspm.html">importspm</tocitem>
+                <tocitem target="loadcontrollers.html">loadcontrollers</tocitem>
+                <tocitem target="multidamp.html">multidamp</tocitem>
+                <tocitem target="plotspm.html">plotspm</tocitem>
+                <tocitem target="sisotf.html">sisotf</tocitem>
+            </tocitem>
+            
+        </tocitem>
+        <tocitem target="https://github.com/MaxHurlstone/DLS-Simulink" 
+                 image="$toolbox/matlab/icons/webicon.gif">
+        DLSimulink GitHub
+        </tocitem>
+    </tocitem>
+</toc>
