@@ -1,10 +1,9 @@
 <?xml version='1.0' encoding="utf-8"?>
 
 <toc version="2.0">
-        <tocitem target="dlsimulink_product_page.html" 
-                 image="HelpIcon.FUNCTION">DLSimulink Toolbox Functions
+        <tocitem target="custom/index.html">DLSimulink Toolbox Functions
 
-            <tocitem target="helpfuncbycat.html#1">ctrlsimtools
+            <tocitem target="custom/ctrlsimtools.html">ctrlsimtools
                 <tocitem target="bodeopts.html">bodeopts</tocitem>
                 <tocitem target="importspm.html">importspm</tocitem>
                 <tocitem target="loadcontrollers.html">loadcontrollers</tocitem>

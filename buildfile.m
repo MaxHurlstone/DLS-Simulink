@@ -85,12 +85,20 @@ fprintf('Found %u .m files.\n',N)
 
 % Clear old documentation
 fprintf('Deleting old documentation...\n')
-delete(fullfile(toolboxdocFolder,'*.html'))
+docclear(toolboxdocFolder);% delete(fullfile(toolboxdocFolder,'*.html'))
 
 % Loop through .m files present and publish
 fprintf('Publishing code documentation to html...\n')
 for n=1:N
-    publish(fullfile(listing(n).folder,listing(n).name),options);
+    fullfname = fullfile(listing(n).folder,listing(n).name);
+
+    if contains(lower(listing(n).name),"contents") || contains(lower(listing(n).name),"slblocks")
+        fprintf('Ignored: %s\n', fullfname)
+        continue
+    else
+        fprintf('Publishing: %s\n', fullfname)
+        publish(fullfname,options);
+    end
 end
 
 
