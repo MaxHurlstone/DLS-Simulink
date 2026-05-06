@@ -92,7 +92,7 @@ fprintf('Publishing code documentation to html...\n')
 for n=1:N
     fullfname = fullfile(listing(n).folder,listing(n).name);
 
-    if contains(lower(listing(n).name),"contents") || contains(lower(listing(n).name),"slblocks")
+    if contains(lower(listing(n).name),"contents") || contains(lower(listing(n).name),"slblocks") || contains(lower(listing(n).name),"dlshapeit")
         fprintf('Ignored: %s\n', fullfname)
         continue
     else
