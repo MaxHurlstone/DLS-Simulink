@@ -1,4 +1,15 @@
-function CPS = cps(PSD,frq);
+function CPS = cps(PSD,frq)
+%CPS Calculates Cumulative Power Spectrum
+%   Calculates cumulative power spectrum, code from original DEB script.
+%
+%   Inputs:
+%   (Required)
+%   PSD - Power spectral density, double
+%   frq - Frequency array, double
+%
+%   See also RUNDEB
+%
+%   DLSimulink Toolbox
 
 [m,n]       = size(PSD);
 CPS			= zeros(m,n);

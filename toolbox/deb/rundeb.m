@@ -1,17 +1,20 @@
-function rundeb(outputID,N,Res,Fmin,Ts,dacrange,dacbits)
+function rundeb(outputID,N,dacrange,dacbits,par,options)
 %RUNDEB Runs a Dynamic Error Budget
 %   Runs a dynamic error budget, using the user selected linear system and
 %   disturbance data. If no disturbance data is selected, default data is
 %   used (data equivalent to that used in 2023 Maglev project).
 %
 %   Inputs:
-%   outputID - Selected performance channel, int32
-%   N - Number of system actuators, int32
-%   Res - Frequency resolution i.e. number of logspace bins, double
-%   Fmin - Minimum frequency, double
-%   Ts - Sample time, double
-%   dacrange - DAC output voltage range, double
-%   dacbits - DAC output bits, double
+%   (Required)
+%   outputID - Selected performance channel, int32 = 1
+%   N - Number of system actuators, int32 = 6
+%   dacrange - DAC output voltage range, double = 20
+%   dacbits - DAC output bits, double = 16
+%   (Optional)
+%   Res - Frequency resolution i.e. number of logspace bins, double = 5000
+%   Fmin - Minimum frequency, double = 0.1
+%   Ts - Sample time, double = 1/2000
+%   unit - Plotting unit, string = 'm'
 %
 %   See also GENPSD
 %
@@ -20,13 +23,21 @@ function rundeb(outputID,N,Res,Fmin,Ts,dacrange,dacbits)
 arguments (Input)
     outputID (1,1) int32 = 1
     N (1,1) int32 = 6
-    Res (1,1) double = 5000
-    Fmin (1,1) double = 0.1
-    Ts (1,1) double = 1/2000
     dacrange (1,1) double = 20
     dacbits (1,1) double = 16
+    par.Res (1,1) double = 5000
+    par.Fmin (1,1) double = 0.1
+    par.Ts (1,1) double = 1/2000
+    options.unit (1,1) string = 'm'
 end
 
+% Check input units
+if or(options.unit == 'm',options.unit == 'rad')
+    % do nothing
+else
+    fprintf('Units may not be valid, please check input arguments.\n')
+end
+   
 fig = uifigure;
 selection = uiconfirm(fig,"Please follow the instructions in the command terminal. Press OK to continue.","rundeb.m",'Icon','info');
 switch selection
@@ -39,19 +50,22 @@ close(fig);
 
 fprintf('\n')
 fprintf('1. Select your linear system model.\n\n')
+fprintf(['   Note, the linear system model inputs must be in the following order:\n', ...
+         '   flrx, flry, flrz, N*amps, N*sens, DAC\n', ...
+         '   , where N* means there are N inputs of that type (for each actuator) corresponding the the N you input in this function.'])
 
 % Load linearised system model
 [file,location] = uigetfile('.mat', 'Select linear system model.');
 TransF    = load(fullfile(location,file));
 G_cLoop   = TransF.LinearAnalysisToolProject.Results.Data.Value;
 
-% Set frequency paraeters
-par.Res      = Res;
-par.Fmin	 = Fmin;
-par.Ts		 = Ts;
+% Set frequency parameters
 par.Fs		 = 1/par.Ts;
 par.Fnyq	 = 1/(2*par.Ts);
 par.frq		 = logspace(log10(par.Fmin),log10(par.Fnyq),par.Res)';
+
+% Set units
+unit = options.unit;
 
 % Set DAC paraeters
 par.dacrange = dacrange;
@@ -65,9 +79,9 @@ fprintf(['2. Select the directory containing your disturbance .csv files.\n', ..
 
 % Open and import disturbance data
 
-dfloc = uigetdir('.csv','Select the directory containing your disturbance data.');
+dfloc = uigetdir('.csv','Select the directory containing your disturbance data. Press cancel to use default data');
 
-fprintf('3. Select a directory to save your PSD and CPS data. Pressing cancel means no data will be saved.\n\n')
+fprintf('3. Select a directory to save your PSD and CPS data. Press cancel and no data will be saved.\n\n')
 
 saveloc = uigetdir('.csv','Select a directory to save your PSD and CPS data.');
 
@@ -97,28 +111,27 @@ PSD_sen  = PSDdata(6,:)';
 
 fprintf('Create disturbance path transfer functions...\n')
 
-% Format for ss from Simulink: flrx, flry, flrz, [amps (ACTUATOR_NUM)], [sens (ACTUATOR_NUM)], [DACs (ACTUATOR_NUM)]
-% Extract and plot discrete transfer functions for each disturbance path
-tf_flrx2xp = bode(G_cLoop(outputID, 1 ),par.frq*2*pi);    % SS transfer function format: <Output number,Input number> 
-tf_flry2xp = bode(G_cLoop(outputID, 2 ),par.frq*2*pi);    % SS transfer function format: <Output number,Input number> 
-tf_flrz2xp = bode(G_cLoop(outputID, 3 ),par.frq*2*pi);    % SS transfer function format: <Output number,Input number> 
-tf_amps2xp = squeeze(bode(G_cLoop(outputID, 4:4+N-1 ),par.frq*2*pi));    % SS transfer function format: <Output number,Input number>
-tf_sens2xp = squeeze(bode(G_cLoop(outputID, 4+N:4+ 2*N -1 ),par.frq*2*pi));    % SS transfer function format: <Output number,Input number>
-tf_DAC2xp = bode(G_cLoop(outputID, 4+ 2*N ),par.frq*2*pi);    % SS transfer function format: <Output number,Input number>
+% Format for ss from Simulink: flrx, flry, flrz, [amps (ACTUATOR_NUM)], [sens (ACTUATOR_NUM)], DAC
+tf_flrx2xp = bode(G_cLoop(outputID, 1 ),par.frq*2*pi);
+tf_flry2xp = bode(G_cLoop(outputID, 2 ),par.frq*2*pi);
+tf_flrz2xp = bode(G_cLoop(outputID, 3 ),par.frq*2*pi);
+tf_amps2xp = squeeze(bode(G_cLoop(outputID, 4:4+N-1 ),par.frq*2*pi));
+tf_sens2xp = squeeze(bode(G_cLoop(outputID, 4+N:4+ 2*N -1 ),par.frq*2*pi));
+tf_DAC2xp = bode(G_cLoop(outputID, 4+ 2*N ),par.frq*2*pi);
 
 fprintf('Plot disturbance path transfer functions...\n')
 
 figure;	
-loglog(par.frq,tf_flrx2xp(:),'-', 'DisplayName','flrx2xp [/m.s^-^2]') % Transfer function using ANSYS SS block is in m/s2
+loglog(par.frq,tf_flrx2xp(:),'-', 'DisplayName',sprintf('flrx2xp [%s/m.s^-^2]',unit)) % Transfer function using ANSYS SS block is in m/s2
 hold on; grid
-loglog(par.frq,tf_flry2xp(:),'-', 'DisplayName','flry2xp [/m.s^-^2]')
-loglog(par.frq,tf_flrz2xp(:),'-', 'DisplayName','flrz2xp [/m.s^-^2]')
+loglog(par.frq,tf_flry2xp(:),'-', 'DisplayName',sprintf('flry2xp [%s/m.s^-^2]',unit))
+loglog(par.frq,tf_flrz2xp(:),'-', 'DisplayName',sprintf('flrz2xp [%s/m.s^-^2]',unit))
 
 for i=1:N
-    loglog(par.frq,tf_amps2xp(i,:).*10^6,'--', 'DisplayName', ['amp' num2str(i) '2xp [/uA]']) % Plot convert to display in uA
-    loglog(par.frq,tf_sens2xp(i,:),'-.', 'DisplayName', ['sens' num2str(i) '2xp [/m]'])
+    loglog(par.frq,tf_amps2xp(i,:).*10^6,'--', 'DisplayName', ['amp' num2str(i) sprintf('2xp [%s/uA]',unit)]) % Plot convert to display in uA
+    loglog(par.frq,tf_sens2xp(i,:),'-.', 'DisplayName', ['sens' num2str(i) sprintf('2xp [%s/m]',unit)])
 end
-loglog(par.frq,tf_DAC2xp(:).*10^3,':', 'DisplayName', 'DAC2xp [/mV]') % Plot convert to display in mV
+loglog(par.frq,tf_DAC2xp(:).*10^3,':', 'DisplayName', sprintf('DAC2xp [%s/mV]',unit)) % Plot convert to display in mV
 
 legend('Location','southwest')
 xlabel('Frequency [Hz]')
@@ -162,7 +175,7 @@ loglog(par.frq,PSD_DAC2xp*1e+12,':', 'DisplayName', 'DAC')
 loglog(par.frq,PSD_tot2xp*1e+12,'k-','LineWidth',1, 'DisplayName', 'Total')  
 legend('Location','southwest')
 xlabel('Frequency [Hz]')
-ylabel('X_P [microns^2/Hz]')
+ylabel(sprintf('X_P [u%s^2/Hz]',unit))
 title('PSD: Contribution to Performance Channel')
 xlim([par.Fmin, 1e+3])
 
@@ -184,21 +197,21 @@ fprintf('<strong>\n--------------- RESULTS ---------------</strong>')
 
 disp(' ')
 disp('---------------------------------------')
-disp(['TOTAL x_p:          ',num2str(sqrt(CPS_tot2xp(end))*1e6,3),' microns RMS'])
+disp(['TOTAL x_p:          ',num2str(sqrt(CPS_tot2xp(end))*1e6,3),sprintf(' u%s RMS',unit)])
 disp('---------------------------------------')
 disp('FLOOR')
-disp(['from floorX:        ',num2str(sqrt(CPS_flrx2xp(end))*1e6,3),' microns RMS'])
-disp(['from floorY:        ',num2str(sqrt(CPS_flry2xp(end))*1e6,3),' microns RMS'])
-disp(['from floorZ:        ',num2str(sqrt(CPS_flrz2xp(end))*1e6,3),' microns RMS'])
+disp(['from floorX:        ',num2str(sqrt(CPS_flrx2xp(end))*1e6,3),sprintf(' u%s RMS',unit)])
+disp(['from floorY:        ',num2str(sqrt(CPS_flry2xp(end))*1e6,3),sprintf(' u%s RMS',unit)])
+disp(['from floorZ:        ',num2str(sqrt(CPS_flrz2xp(end))*1e6,3),sprintf(' u%s RMS',unit)])
 disp('---------------------------------------')
 
 for i=1:N
     disp(['ACTUATOR ' num2str(i) ])
-    disp([['from amp' num2str(i) ':          '],num2str(sqrt(CPS_amps2xp(end,i))*1e6,3),' microns RMS'])
-    disp([['from sensor' num2str(i) ':       '],num2str(sqrt(CPS_sens2xp(end,i))*1e6,3),' microns RMS'])
+    disp([['from amp' num2str(i) ':          '],num2str(sqrt(CPS_amps2xp(end,i))*1e6,3),sprintf(' u%s RMS',unit)])
+    disp([['from sensor' num2str(i) ':       '],num2str(sqrt(CPS_sens2xp(end,i))*1e6,3),sprintf(' u%s RMS',unit)])
     disp('---------------------------------------')
 end
-disp(['from DAC:           ',num2str(sqrt(CPS_DAC2xp(end))*1e6,3),' microns RMS'])
+disp(['from DAC:           ',num2str(sqrt(CPS_DAC2xp(end))*1e6,3),sprintf(' u%s RMS',unit)])
 disp('---------------------------------------')
 
 figure;	
@@ -216,25 +229,25 @@ semilogx(par.frq,CPS_DAC2xp*1e+12,':', 'DisplayName','DAC')
 semilogx(par.frq,CPS_tot2xp*1e+12,'k-','LineWidth',1, 'DisplayName', 'Total')  
 legend('Location','northwest')
 xlabel('Frequency [Hz]')
-ylabel('||X_p||^2_R_M_S [microns^2]')
+ylabel(sprintf('||X_p||^2_R_M_S [u%s^2]',unit))
 title('CPS: Contribution to Performance Channel')
 xlim([par.Fmin, 1e+3])
 
-text(par.frq(end)*1.0,CPS_flrx2xp(end)*1e+12,[num2str(sqrt(CPS_flrx2xp(end))*1e6,3) ' microns'])
-text(par.frq(end)*1.0,CPS_flry2xp(end)*1e+12,[num2str(sqrt(CPS_flry2xp(end))*1e6,3) ' microns'])
-text(par.frq(end)*1.0,CPS_flrz2xp(end)*1e+12,[num2str(sqrt(CPS_flrz2xp(end))*1e6,3) ' microns'])
+text(par.frq(end)*1.0,CPS_flrx2xp(end)*1e+12,[num2str(sqrt(CPS_flrx2xp(end))*1e6,3) sprintf(' u%s',unit)])
+text(par.frq(end)*1.0,CPS_flry2xp(end)*1e+12,[num2str(sqrt(CPS_flry2xp(end))*1e6,3) sprintf(' u%s',unit)])
+text(par.frq(end)*1.0,CPS_flrz2xp(end)*1e+12,[num2str(sqrt(CPS_flrz2xp(end))*1e6,3) sprintf(' u%s',unit)])
 
 for i=1:N
-    text(par.frq(end)*1.0,CPS_amps2xp(end,i)*1e+12,[num2str(sqrt(CPS_amps2xp(end,i))*1e6,3) ' microns'])
-    text(par.frq(end)*1.0,CPS_sens2xp(end,i)*1e+12,[num2str(sqrt(CPS_sens2xp(end,i))*1e6,3) ' microns'])
+    text(par.frq(end)*1.0,CPS_amps2xp(end,i)*1e+12,[num2str(sqrt(CPS_amps2xp(end,i))*1e6,3) sprintf(' u%s',unit)])
+    text(par.frq(end)*1.0,CPS_sens2xp(end,i)*1e+12,[num2str(sqrt(CPS_sens2xp(end,i))*1e6,3) sprintf(' u%s',unit)])
 end
 
-text(par.frq(end)*1.0,CPS_DAC2xp(end)*1e+12,[num2str(sqrt(CPS_DAC2xp(end))*1e6,3) ' microns'])
-text(par.frq(end)*1.0,CPS_tot2xp(end)*1e+12,[num2str(sqrt(CPS_tot2xp(end))*1e6,3) ' microns'])
+text(par.frq(end)*1.0,CPS_DAC2xp(end)*1e+12,[num2str(sqrt(CPS_DAC2xp(end))*1e6,3) sprintf(' u%s',unit)])
+text(par.frq(end)*1.0,CPS_tot2xp(end)*1e+12,[num2str(sqrt(CPS_tot2xp(end))*1e6,3) sprintf(' u%s',unit)])
 
 % Export PSD as CSV 
 if saveloc
-    varNames = {'Frequency [Hz]'; 'PSD [microns/s^2]^2/Hz'};
+    varNames = {'Frequency [Hz]'; sprintf('PSD [u%s/s^2]^2/Hz',unit)};
     exportTab = table(par.frq, PSD_tot2xp,'VariableNames', varNames);
 
     fname = string(datetime("today"))+ "_DEB_PSD.csv";
@@ -243,7 +256,7 @@ if saveloc
     fprintf('PSD saved to: %s\n',fullfname)
     
     % Export CPS as CSV
-    varNames = {'Frequency [Hz]'; 'CPS microns^2'};
+    varNames = {'Frequency [Hz]'; sprintf('CPS u%s^2',unit)};
     exportTab = table(par.frq, CPS_tot2xp,'VariableNames', varNames);
 
     fname = string(datetime("today"))+ "_DEB_CPS.csv";
