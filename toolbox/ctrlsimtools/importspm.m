@@ -7,7 +7,7 @@ function system = importspm(Norder, doplot, file)
 %   Norder - Order of reduced order model, integer (default 0)
 %
 %   Outputs:
-%   system - MATLAB state space
+%   system - State space, ss
 %
 %   See also SISOTF, PLOTSPM
 %
