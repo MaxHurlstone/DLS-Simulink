@@ -26,7 +26,7 @@ function archiveTask(~)
 
 projectRoot = currentProject().RootFolder;
 
-toolboxFolder = fullfile(projectRoot, "toolbox");
+toolboxFolder = fullfile(projectRoot, "toolbox", "dlsimulink");
 myUUID = "f1be6fd5-7861-44c4-bfec-a98ded851b12";
 opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, myUUID);
 
@@ -34,7 +34,7 @@ opts = matlab.addons.toolbox.ToolboxOptions(toolboxFolder, myUUID);
 opts.AuthorName = "Maxime Hurlstone";
 opts.AuthorEmail = "max.hurlstone@diamond.ac.uk";
 opts.ToolboxName = "DLSimulink";
-opts.ToolboxVersion = ver("toolbox").Version; % this relies on you have a Content.m file
+opts.ToolboxVersion = ver("toolbox/dlsimulink").Version; % this relies on you have a Content.m file
 mltbxFileName = 'dlsimulink.mltbx';
 opts.OutputFile = fullfile(projectRoot, 'releases', mltbxFileName);
 opts.MinimumMatlabRelease = "R2025b";
