@@ -12,10 +12,10 @@ tidyUp = onCleanup(@() cd(currFolder));
 projRoot = currentProject().RootFolder;
 
 % CD to folder containing custom components
-cd(fullfile(projRoot, "toolbox", "csl", "components"));
+cd(fullfile(projRoot, "toolbox", "dlsimulink", "csl", "components"));
 
 % Create full path of library file
-libraryFileName = fullfile(projRoot, "toolbox", "csl", "library", "DLSimscape");
+libraryFileName = fullfile(projRoot, "toolbox", "dlsimulink", "csl", "library", "DLSimscape");
 
 % Build library
 sscbuild("DLSimscape", "-output", libraryFileName);
