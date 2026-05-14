@@ -1,5 +1,7 @@
 # DLSimulink
 
+Install **DLSimulink**, then type `dlshelp` in the MATLAB command window!
+
 ## Status
 
 Under development!
