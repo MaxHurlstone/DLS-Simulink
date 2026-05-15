@@ -41,7 +41,7 @@ opts.MinimumMatlabRelease = "R2025b";
 opts.ToolboxImageFile = "./images/dlsimulink.png";
 
 % Set up what should be on the path
-toAddToPath = genpath( fullfile("toolbox") ); % genpath( fullfile(projectRoot, "toolbox") );
+toAddToPath = genpath( fullfile("toolbox/dlsimulink") ); % genpath( fullfile(projectRoot, "toolbox") );
 toAddToPath = string( split(toAddToPath(1:end-1), ";") );
 opts.ToolboxMatlabPath = toAddToPath;
 
