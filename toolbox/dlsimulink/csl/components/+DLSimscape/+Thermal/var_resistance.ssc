@@ -1,0 +1,31 @@
+component var_resistance < foundation.thermal.branch
+% Thermal Resistance
+% This block represents a generic resistance in a thermal network. The heat
+% flow rate is proportional to the temperature difference and inversely
+% proportional to the resistance.
+
+% Copyright 2016 The MathWorks, Inc.
+
+parameters
+    resistance_vec = {[0.1  1    10],  'K/W'    }; % Thermal resistance
+    tvec           = {[250, 273, 300], 'K'      }; % Temperature vector
+end
+
+equations
+    assert(resistance >= 0)
+end
+
+intermediates(ExternalAccess = observe)
+    T_avg = T*0.5 + B.T; % Average temperature
+    resistance = tablelookup(tvec,resistance_vec,T_avg,interpolation = smooth,extrapolation = nearest); % Thermal conductivity
+end
+
+equations
+    if isfinite(resistance)
+        T == resistance * Q;
+    else
+        Q == 0;
+    end
+end
+
+end
