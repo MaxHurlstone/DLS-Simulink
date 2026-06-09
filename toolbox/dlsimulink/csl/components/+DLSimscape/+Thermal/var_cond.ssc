@@ -1,0 +1,131 @@
+component var_cond < foundation.thermal.branch
+% Conductive Heat Transfer
+% This block models heat transfer in a thermal network by conduction
+% through a layer of material. The rate of heat transfer is governed by
+% Fourier's law and is proportional to the temperature difference, material
+% thermal conductivity, area normal to the heat flow direction, and
+% inversely proportional to the layer thickness. The thermal conductivity 
+% can be either variable or constant. This modified version of the standard
+% conduction Simscape block uses smooth (makima) interpolation for the
+% conductivity values.
+
+% Max Hurlstone 06-2026
+
+% Custom component modified from conduction.ssc
+
+inputs (ExternalAccess = none)
+    var_th_cond = {401, 'W/(m*K)'}; %K:left
+end
+
+parameters
+    thermal_type = foundation.enum.ConstantVariableTabulated.Constant; % Conductivity type
+    %                               1 - Constant
+    %                               2 - Variable input
+    %                               3 - Tabulated data
+
+    wall_geometry = foundation.enum.ConductionWallGeometry.Planar; % Wall geometry
+    %                               1 - Planar
+    %                               2 - Cylindrical    
+end
+
+parameters (Access = public, ExternalAccess = none)
+    %Planar Wall Parameters
+    area      = {1e-4, 'm^2'    }; % Area
+    thickness = {0.1,  'm'      }; % Thickness
+
+    % Cylindrical Wall Parameters
+    d_in          = {0.05, 'm'      }; % Inner diameter
+    d_out         = {0.1,  'm'      }; % Outer diameter
+    L             = {1,    'm'      }; % Length
+
+    % Variable input parameters
+    th_cond_min   = {10,   'W/(m*K)'}; % Minimum thermal conductivity
+
+    % Conductivity Parameters
+    th_cond = {401,   'W/(m*K)'}; % Thermal conductivity
+    th_cond_TLU   = {[413, 401, 392, 383, 371, 357,  342],  'W/(m*K)'}; % Thermal conductivity vector
+    temp_TLU      = {[200, 273, 400, 600, 800, 1000, 1200], 'K'      }; % Temperature vector
+end
+
+% Parameter and visibility checks for conductivity
+if thermal_type == foundation.enum.ConstantVariableTabulated.Constant
+    annotations
+        th_cond : ExternalAccess = modify
+    end
+    parameters(ExternalAccess = none)
+        th_cond_ = th_cond; % Thermal conductivity
+    end
+    equations
+        assert(th_cond > 0)
+    end
+elseif thermal_type == foundation.enum.ConstantVariableTabulated.Variable
+    annotations
+        var_th_cond : ExternalAccess = modify
+        th_cond_min : ExternalAccess = modify
+        Icon = 'conduction_variable.svg';
+    end
+    intermediates(ExternalAccess = none)
+        th_cond_ = if var_th_cond >= th_cond_min, var_th_cond else th_cond_min end; % Thermal conductivity
+    end
+    equations
+        assert(th_cond_min > 0)
+    end 
+else % if thermal_type == foundation.enum.ConstantVariableTabulated.Tabulated
+    annotations
+        [th_cond_TLU, temp_TLU] : ExternalAccess = modify
+    end
+    if wall_geometry == foundation.enum.ConductionWallGeometry.Planar
+        parameters (Access=private, ExternalAccess=none)
+            avg_factor = 0.5;
+        end
+    else % if wall_geometry == foundation.enum.ConductionWallGeometry.Cylindrical
+        parameters (Access=private, ExternalAccess=none)
+            avg_factor = d_out/(d_out - d_in) - 1/(log(d_out/d_in));
+        end
+    end
+    intermediates(ExternalAccess = observe)
+        T_avg = T*avg_factor + B.T; % Average temperature
+        th_cond_ = tablelookup(temp_TLU,th_cond_TLU,T_avg,interpolation = smooth,extrapolation = nearest); % Thermal conductivity
+    end
+    equations
+         assert(all(th_cond_TLU > 0))
+         assert(all(temp_TLU > 0))
+         assert(numel(temp_TLU) >=2)
+         assert(numel(th_cond_TLU) == numel(temp_TLU))
+         assert(all(diff(temp_TLU) > 0))
+    end 
+end
+
+% Parameter and visibility checks for geometry
+if wall_geometry == foundation.enum.ConductionWallGeometry.Planar
+    annotations
+        [area, thickness] : ExternalAccess=modify
+    end
+    parameters(Access = private, ExternalAccess = none)
+        cond_length = area/thickness; % Effective conduction length
+    end
+    equations
+        assert(area > 0)
+        assert(thickness > 0)
+    end
+
+else % if wall_geometry == foundation.enum.ConductionWallGeometry.Cylindrical
+    annotations
+        [d_in, d_out, L] : ExternalAccess=modify
+    end
+    parameters(Access = private, ExternalAccess = none)
+        cond_length = 2*pi*L/log(d_out/d_in); % Effective conduction length
+    end
+    equations
+        assert(d_in > 0)
+        assert(d_out > d_in)
+        assert(L > 0)
+    end
+end
+
+equations
+    assert(th_cond_ > 0)
+    Q == T * th_cond_ * cond_length;
+end
+
+end
