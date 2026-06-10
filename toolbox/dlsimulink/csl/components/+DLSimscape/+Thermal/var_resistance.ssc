@@ -1,10 +1,12 @@
 component var_resistance < foundation.thermal.branch
-% Thermal Resistance
+% Variable Thermal Resistance
 % This block represents a generic resistance in a thermal network. The heat
 % flow rate is proportional to the temperature difference and inversely
 % proportional to the resistance.
-
-% Copyright 2016 The MathWorks, Inc.
+%
+% Max Hurlstone 06-2026
+%
+% Custom component modified from resistance.ssc
 
 parameters
     resistance_vec = {[0.1  1    10],  'K/W'    }; % Thermal resistance

@@ -1,5 +1,5 @@
 component var_cond < foundation.thermal.branch
-% Conductive Heat Transfer
+% Variable Conductivity Conductive Heat Transfer
 % This block models heat transfer in a thermal network by conduction
 % through a layer of material. The rate of heat transfer is governed by
 % Fourier's law and is proportional to the temperature difference, material
