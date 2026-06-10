@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:d="http://www.mathworks.com/blockgraphics" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="svg" width="5669" height="3779" d:options="Foreground:PortStyled;Background:Transparent;StrokeScaling:PortStyled;StrokeScalingOnResize:NonScaling;LineExtension:On;Rotate:undefined;Resize:FitToBlock;Frame:Off;Clipping:None;PreAdjustStrokeWidth:Normalized;Port:Auto Majority;">
+	<g id="part_1" title="part_0" ie-ports="left:foundation-thermal-thermal,top:,right:foundation-thermal-thermal,bottom:">
+		<g id="group" style="stroke-width:.025in; fill:none">
+			<path id="path" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; " d=" M 0,1889 L 1417,1889"/>
+			<path id="path_1" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; " d=" M 4251,1889 L 5669,1889"/>
+			<rect id="rect" style="stroke:#000000;stroke-width:8;stroke-linejoin:miter;stroke-linecap:butt;fill:none" d:options="ClosedShapeFill:On;" x="1417" y="944" width="2834" height="1889" rx="0" ry="0"/>
+			<path id="path_2" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; fill:#000000; " d=" M 2914,1417 L 3779,1417 L 3454.51,1181 L 3454.51,1653 L 3779,1417"/>
+			<path id="path_3" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; fill:#000000; " d=" M 2914,2362 L 3779,2362 L 3454.51,2125 L 3454.51,2598 L 3779,2362"/>
+		</g>
+		<path id="path_104" style="stroke:#000000;stroke-width:8; stroke-linejoin:miter; stroke-linecap:butt; fill:#000000; " transform="matrix(0.6156614753,-0.7880107536,0.7880107536,0.6156614753,-579.3124360944,2486.7488676603)" d=" M 1498.83,1837.25 L 3020.45,1837.25 L 2449.64,1601.25 L 2449.64,2073.25 L 3020.45,1837.25"/>
+	</g>
+</svg>
