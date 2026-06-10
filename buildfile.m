@@ -45,6 +45,11 @@ toAddToPath = genpath( fullfile("toolbox") ); % genpath( fullfile(projectRoot, "
 toAddToPath = string( split(toAddToPath(1:end-1), ";") );
 opts.ToolboxMatlabPath = toAddToPath;
 
+% Add Lambrechts Setpoints to Required Addons
+opts.RequiredAddons.Name = "Advanced Setpoints for Motion Systems";
+opts.RequiredAddons.Identifier = "e5554c0b-4a80-11e4-9553-005056977bd0";
+opts.RequiredAddons.EarliestVersion = "1.2.0.1";
+
 % Optional stuff
 % opts.ToolboxGettingStartedGuide = ""; % path to guide
 % Set what you need
@@ -52,7 +57,7 @@ opts.ToolboxMatlabPath = toAddToPath;
 % opts.AuthorCompany = "";
 % opts.Description = "";
 % opts.RequiredAdditionalSoftware = "";
-% opts.RequiredAddons = "";
+
 % opts.Summary = "";
 % opts.SupportedPlatforms = "";
 % opts.ToolboxFiles = "";
