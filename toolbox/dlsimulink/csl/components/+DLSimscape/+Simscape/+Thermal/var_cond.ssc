@@ -59,11 +59,6 @@ if thermal_type == foundation.enum.ConstantVariableTabulated.Constant
         assert(th_cond > 0)
     end
 elseif thermal_type == foundation.enum.ConstantVariableTabulated.Variable
-    annotations
-        var_th_cond : ExternalAccess = modify
-        th_cond_min : ExternalAccess = modify
-        Icon = 'conduction_variable.svg';
-    end
     intermediates(ExternalAccess = none)
         th_cond_ = if var_th_cond >= th_cond_min, var_th_cond else th_cond_min end; % Thermal conductivity
     end
