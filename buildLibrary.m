@@ -13,7 +13,8 @@ projRoot = currentProject().RootFolder;
 
 % CD and build the SSC library
 % DO NOT CHANGE NAME (SSClib) OF THIS INTERMEDIATE LIBRARY
-sscLibPath = fullfile(projRoot, "toolbox", "dlsimulink", "csl", "library", "SSClib");
+sscLibName = "SSClib";
+sscLibPath = fullfile(projRoot, "toolbox", "dlsimulink", "csl", "library", sscLibName);
 
 % CD into SSC raw code folder and generate library
 cd(fullfile(projRoot, "toolbox", "dlsimulink", "csl", "components"));
@@ -36,11 +37,13 @@ load_system(dlsLibName)
 set_param(dlsLibName,"Lock","off");
 
 destination = join([dlsLibName, subSysName], "/");
-add_block(source, destination, "MakeNameUnique", "on",...
+delete_block(dlsLibName + "/Simscape")
+add_block(source, destination, "MakeNameUnique", "off",...
           "CopyOption", "nolink");
 
 % Save and lock
 save_system(dlsLibName);
 
 % Delete intermediate SSC library
+cd(fullfile(projRoot, "toolbox", "dlsimulink", "csl", "library"))
 delete SSClib.slx
