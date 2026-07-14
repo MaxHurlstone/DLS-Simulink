@@ -67,6 +67,6 @@ fprintf('Xtal area = %0.0f mm2\n',xarea)
 fprintf('Pressure area = %0.0f mm2\n',parea)
 fprintf('Pressure area percent = %0.0f %%\n',pperc)
 
-title(sprintf('Pressure area percent = %0.0f %%\n',pperc))
+title(sprintf('Pressure area = %0.0f %%\n',pperc))
 
 end
