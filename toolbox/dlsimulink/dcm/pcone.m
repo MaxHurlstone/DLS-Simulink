@@ -16,18 +16,26 @@ D = d + 2*t*tand(theta);
 % Create patch for crystal area
 xpatch = polyshape([0 0 1 1]*xdim(1),[1 0 0 1]*xdim(2));
 
+figure()
+hold on;
+
 nop = xpatch;
 % Loop through fasteners and plot pressure area
 for i=1:size(scoords,1)
     ppatch = nsidedpoly(100,Center=scoords(i,:),Radius=D/2);
+
+    pgp = plot(ppatch);
+    pgp.FaceColor = [1 0 0];
 
     % Subtract pressure area from xtal area
     nop = subtract(nop,ppatch);
     
 end
 
-figure()
-plot(nop)
+plot(nop);
+
+xlabel('x [mm]')
+ylabel('y [mm]')
 
 % Calculate areas
 xarea = area(xpatch);
@@ -36,5 +44,7 @@ parea = xarea - area(nop);
 fprintf('Xtal area = %0.0f mm2\n',xarea)
 fprintf('Pressure area = %0.0f mm2\n',parea)
 fprintf('Pressure area percent = %0.0f %%\n',100*parea/xarea)
+
+title(sprintf('Pressure area percent = %0.0f %%\n',100*parea/xarea))
 
 end
