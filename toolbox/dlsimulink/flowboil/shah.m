@@ -1,82 +1,134 @@
-function [hbar] = shah(q,mdot,di,rhoG,rhoL,muL,cpL,kL,hLG,n)
+function [hbar] = shah(q,A,mdotmax,di,n,orien,rhoG,rhoL,muL,cpL,kL,hLG)
 %SHAH Summary of this function goes here
-%   Detailed explanation goes here
-% arguments (Input)
-%     inputArg1
-%     inputArg2
-% end
-% 
-% arguments (Output)
-%     outputArg1
-%     outputArg2
-% end
+%  Detailed explanation goes here
 
-% Create vapour quality vector
+arguments (Input)
+    q (1,1) double
+    A (1,1) double
+    mdotmax (1,1) double
+    di (1,1) double
+    n (1,1) double
+    orien (1,1) logical 
+    rhoG (1,1) double = 4.6
+    rhoL (1,1) double = 806
+    muL (1,1) double = 1.61e-4
+    cpL (1,1) double = 2000
+    kL (1,1) double = 0.145
+    hLG (1,1) double = 200000
+end
+
+arguments (Output)
+    hbar (1,1) double    
+end
+
+% Work out cross-sectional flow area
+Acs = 0.25*pi*(di^2);
+
+% Calculate mass flux
+Gmax = mdotmax/Acs;
+
+% Create analysis grid for mass flow and vapour quality
 dx = 1/n;
 x = (dx:dx:1)';
 
+dG = Gmax/n;
+G = dG:dG:Gmax;
+
+x = repmat(x,1,n);
+G = repmat(G,n,1);
+
 % Calculate Shah C0 factor
 C0 = (((1-x)./x).^0.8) * ((rhoG/rhoL)^0.5);
-N = C0;
-
-% Calculate Froude
-FrL = (mdot*mdot) / (rhoL*rhoL*9.81*di);
 
 % Calculate effective liquid only Reynolds number and Prandtl number
-ReL = (mdot.*(1-x).*di) ./ muL;
+ReL = (G.*(1-x).*di) ./ muL;
 PrL = (cpL*muL) / kL;
 
 % Calculate a_L using Dittus-Boelter
-a_L = 0.023 * (ReL.^0.8) * (PrL.^0.4) * (kL/di);
-
-% Calculate convective boiling a_cb
-a_cb = a_L.*(1.8./(N.^0.8));
+h_L = 0.023 * (ReL.^0.8) * (PrL.^0.4) * (kL/di);
 
 % Calculate boiling number
-Bo = q/(mdot*hLG);
+Bo = q./(G.*hLG);
 
-% Calculate Fs
-if Bo > 0.0011
-    Fs = 14.7;
-else
-    Fs = 15.43;
+% Calculate Froude
+FrL = (G.*G) ./ (rhoL*rhoL*9.81*di);
+
+% Adjust N and show warning if conditions not valid
+N = C0;
+if orien 
+    FrLbool = FrL < 0.04;
+    N(FrLbool) = 0.38.*(FrL(FrLbool).^(-0.3)).*C0(FrLbool);
+
+    if any(Bo < 0.0001)
+        fprintf('Conditions fall outside of the model validity.\n')
+    end    
 end
 
-a_nb = zeros(n,1);
+% Calculate convective boiling a_cb
+h_cb = h_L.*(1.8./(N.^0.8));
 
-for i=1:n
-    Ni = N(i);
-    a_Li = a_L(i);
+% Preallocate h_nb
+h_nb = zeros(n);
 
-    % Calculate nucleate boiling a_nb
-    if Ni > 1
-    
-        if Bo > 0.0003
-            a_nb(i) = 230*(Bo^0.5)*a_Li;
-        else
-            a_nb(i) = (1 + (46*(Bo^0.5)))*a_Li;
-        end
-    
-    elseif (0.1 < Ni) && (Ni < 1)
-         a_nb(i) = (Fs*(Bo^0.5)*exp((2.74*Ni) - 0.1))*a_Li;
-    
-    elseif Ni < 0.1
-        a_nb(i) = (Fs*(Bo^0.5)*exp((2.74*Ni) - 0.15))*a_Li;
-    end
+% Calculate F constant
+Fs = ones(n)*15.43;
+Fs(Bo > 0.0011) = 14.7;
 
-end
+% Case 1 N > 1
+bool_1 = N > 1;
+bool_2 = bool_1 & (Bo > 0.0003);
+bool_3 = (0.1 < N) & (N < 1);
+bool_4 = N < 0.1;
+
+h_nb(bool_1) = (1 + (46.*(Bo(bool_1).^0.5))).*h_L(bool_1);
+h_nb(bool_2) = 230.*(Bo(bool_2).^0.5).*h_L(bool_2);
+h_nb(bool_3) = (Fs(bool_3).*(Bo(bool_3).^0.5).*exp(2.74.*(N(bool_3).^(-0.1)))).*h_L(bool_3);
+h_nb(bool_4) = (Fs(bool_4).*(Bo(bool_4).^0.5).*exp(2.47.*(N(bool_4).^(-0.15)))).*h_L(bool_4);
 
 % Calculate local heat transfer coefficient
-a_tp = max(a_nb,a_cb);
+h_tp = max(h_nb,h_cb);
 
-% Calcualte average heat transfer coefficient
-hbar = mean(a_tp);
+% Calculate exit vapour quality
+xout = (q*A)./(G.*Acs.*hLG);
+xout(xout > 1) = 1;
+
+h_tp_actual = h_tp;
+h_tp_actual(x > xout) = nan;
+h_tp_actual(x > 0.5) = nan;
+
+hbar = mean(h_tp_actual,1,'omitmissing');
 
 figure()
-plot(x,a_tp./a_L); hold on;
-grid on
-xlabel('x')
-ylabel('a_tp/a_L')
+surf(C0, G, h_tp./h_L);
+xlabel('Convection number (C0)');
+ylabel('Mass Flux (G)');
+zlabel('\psi = h_{tp}/h_L');
+set(gca,'XScale','log')
+set(gca,'ZScale','log')
+title('Shah \psi plot')
+colorbar;
 
+figure()
+surf(x, G, h_tp,'FaceAlpha',0.1,'EdgeAlpha',0.1); hold on
+h_tp_actual(isnan(h_tp_actual))=0;
+surf(x, G, h_tp_actual);
+plot3(ones(1,n),G(1,:),hbar,'LineWidth',5,'Color','r')
+xlabel('Vapour quality (x)');
+ylabel('Mass Flux (G)');
+zlabel('Local Heat Transfer Coefficient (h_{tp})');
+set(gca,'XScale','log')
+set(gca,'ZScale','log')
+title('Plot of local h_{tp} - "out-of-heat-exchanger" values suppressed')
+colorbar;
+
+figure()
+plot(G(1,:).*Acs,hbar)
+xlabel('Mass flux [kg/s]');
+ylabel('Avergae h [W/m2K]');
+title('Average h_{tp}')
+grid on
+
+% Calcualte max average heat transfer coefficient
+hbar = max(hbar);
 
 end
