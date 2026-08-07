@@ -1,4 +1,4 @@
-function [mdot,hbar] = shah(q,A,mdotmax,di,n,orien,rhoG,rhoL,muL,cpL,kL,hLG)
+function [hbar,mdot] = shah(q,A,mdotmax,di,n,orien,rhoG,rhoL,muL,cpL,kL,hLG)
 %SHAH Shah 1982 Flow Boiling Correlation Calculator
 %   Uses the Shah 1982 pre-dryout flow boiling correlation to estimate the
 %   local heat transfer coefficient. Surface plots show the variation of
@@ -81,7 +81,7 @@ C0 = (((1-x)./x).^0.8) * ((rhoG/rhoL)^0.5);
 ReL = (G.*(1-x).*di) ./ muL;
 PrL = (cpL*muL) / kL;
 
-% Calculate a_L using Dittus-Boelter
+% Calculate h_L using Dittus-Boelter
 h_L = 0.023 * (ReL.^0.8) * (PrL.^0.4) * (kL/di);
 
 % Calculate boiling number
@@ -101,7 +101,7 @@ if orien
     end    
 end
 
-% Calculate convective boiling a_cb
+% Calculate convective boiling h_cb
 h_cb = h_L.*(1.8./(N.^0.8));
 
 % Preallocate h_nb
@@ -113,29 +113,35 @@ Fs(Bo > 0.0011) = 14.7;
 
 % Case 1 N > 1
 bool_1 = N > 1;
+% Case 2 N > 1 & Bo > 0.0003
 bool_2 = bool_1 & (Bo > 0.0003);
+% Case 3 0.1 < N < 1
 bool_3 = (0.1 < N) & (N < 1);
+% Case 4 N < 0.1
 bool_4 = N < 0.1;
 
+% Evaluate all cases
 h_nb(bool_1) = (1 + (46.*(Bo(bool_1).^0.5))).*h_L(bool_1);
 h_nb(bool_2) = 230.*(Bo(bool_2).^0.5).*h_L(bool_2);
 h_nb(bool_3) = (Fs(bool_3).*(Bo(bool_3).^0.5).*exp(2.74.*(N(bool_3).^(-0.1)))).*h_L(bool_3);
 h_nb(bool_4) = (Fs(bool_4).*(Bo(bool_4).^0.5).*exp(2.47.*(N(bool_4).^(-0.15)))).*h_L(bool_4);
 
-% Calculate local heat transfer coefficient
+% Calculate local heat transfer coefficient by max of h_cb and h_nb
 h_tp = max(h_nb,h_cb);
 
-% Calculate exit vapour quality
+% Calculate system outlet vapour quality
 xout = (q*A)./(G.*Acs.*hLG);
 xout(xout > 1) = 1;
 
 h_tp_actual = h_tp;
 h_tp_actual(x > xout) = nan;
-h_tp_actual(x > 0.5) = nan;
+h_tp_actual(x > 0.5) = nan; % assuming dryout at x = 0.5
 
+% Calculate final return data
 mdot = G(1,:).*Acs;
 hbar = mean(h_tp_actual,1,'omitmissing');
 
+% Plotting
 figure()
 surf(C0, G, h_tp./h_L);
 xlabel('Convection number (C0)');
@@ -165,8 +171,5 @@ xlabel('Mass flux [kg/s]');
 ylabel('Avergae h [W/m2K]');
 title('Average h_{tp}')
 grid on
-
-% Calcualte max average heat transfer coefficient
-hbar = max(hbar);
 
 end
