@@ -1,6 +1,41 @@
-function [hbar] = shah(q,A,mdotmax,di,n,orien,rhoG,rhoL,muL,cpL,kL,hLG)
-%SHAH Summary of this function goes here
-%  Detailed explanation goes here
+function [mdot,hbar] = shah(q,A,mdotmax,di,n,orien,rhoG,rhoL,muL,cpL,kL,hLG)
+%SHAH Shah 1982 Flow Boiling Correlation Calculator
+%   Uses the Shah 1982 pre-dryout flow boiling correlation to estimate the
+%   local heat transfer coefficient. Surface plots show the variation of
+%   this quantity against both mass flow rate and vapour quality. An average
+%   heat transfer coefficient for a range of mass flow rates is calculated
+%   and returned. More detail on how the average heat transfer coefficient
+%   is calculated is given below.
+%
+% Inputs:
+%   q - heat flux, double
+%   A - heat transfer area, double
+%   mdotmax - maximum analysis mass flow rate, double
+%   di - inside tube diameter, double
+%   n - analysis grid dimensions n x n, int
+%   orien - flow orientation: horizontal (1) and vertical (0), bool
+%   rhoG - gas density, double
+%   rhoL - liquid density, double
+%   muL - liquid viscosity, double
+%   cpL - liquid specific heat capacity, double
+%   kL - liquid conductivity, double
+%   hLG - latent heat of vaporisation, double
+%
+% Outputs:
+%   hbar - array of average heat transfer coefficients, double
+%   mdot - corresponding array of mass flow rates, double
+%
+%   More information on average heat transfer coefficient calculation:
+%  
+%   The input power is used to estimate the process outlet vapour quality: 
+%   xout = qA/mdot*hLG
+%   In the grid of data, if the vapour quality is greater than this value,
+%   or if it is greater than an assumed xcrit = 0.5 (dryout), the
+%   corresponding local heat transfer coefficient is set to zero. The
+%   average is then done along vapour quality, for each mass flow rate
+%   column.
+%
+%   DLSimulink Toolbox
 
 arguments (Input)
     q (1,1) double
@@ -9,6 +44,7 @@ arguments (Input)
     di (1,1) double
     n (1,1) double
     orien (1,1) logical 
+    % Default fluid data for N2 at atmospheric pressure
     rhoG (1,1) double = 4.6
     rhoL (1,1) double = 806
     muL (1,1) double = 1.61e-4
@@ -18,7 +54,8 @@ arguments (Input)
 end
 
 arguments (Output)
-    hbar (1,1) double    
+    hbar (1,:) double 
+    mdot (1,:) double 
 end
 
 % Work out cross-sectional flow area
@@ -96,6 +133,7 @@ h_tp_actual = h_tp;
 h_tp_actual(x > xout) = nan;
 h_tp_actual(x > 0.5) = nan;
 
+mdot = G(1,:).*Acs;
 hbar = mean(h_tp_actual,1,'omitmissing');
 
 figure()
@@ -122,7 +160,7 @@ title('Plot of local h_{tp} - "out-of-heat-exchanger" values suppressed')
 colorbar;
 
 figure()
-plot(G(1,:).*Acs,hbar)
+plot(mdot,hbar)
 xlabel('Mass flux [kg/s]');
 ylabel('Avergae h [W/m2K]');
 title('Average h_{tp}')
