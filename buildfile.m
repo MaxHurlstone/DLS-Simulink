@@ -41,14 +41,17 @@ opts.MinimumMatlabRelease = "R2025b";
 opts.ToolboxImageFile = "./images/dlsimulink.png";
 
 % Set up what should be on the path
-toAddToPath = genpath( fullfile("toolbox") ); % genpath( fullfile(projectRoot, "toolbox") );
+toAddToPath = genpath( fullfile("toolbox", "dlsimulink") ); % genpath( fullfile(projectRoot, "toolbox") );
 toAddToPath = string( split(toAddToPath(1:end-1), ";") );
 opts.ToolboxMatlabPath = toAddToPath;
 
 % Add Lambrechts Setpoints to Required Addons
-opts.RequiredAddons.Name = "Advanced Setpoints for Motion Systems";
-opts.RequiredAddons.Identifier = "e5554c0b-4a80-11e4-9553-005056977bd0";
-opts.RequiredAddons.EarliestVersion = "1.2.0.1";
+opts.RequiredAddons = struct( ...
+                      "Name","Advanced Setpoints for Motion Systems", ...
+                      "Identifier", "e5554c0b-4a80-11e4-9553-005056977bd0", ...
+                      "EarliestVersion","1.2.0.1", ...
+                      "LatestVersion","1.2.0.1", ...
+                      "DownloadURL","");
 
 % Optional stuff
 % opts.ToolboxGettingStartedGuide = ""; % path to guide
