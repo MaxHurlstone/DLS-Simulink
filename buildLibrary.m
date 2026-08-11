@@ -42,7 +42,7 @@ add_block(source, destination, "MakeNameUnique", "off",...
           "CopyOption", "nolink");
 
 % Save and lock
-save_system(dlsLibName);
+save_system(dlsLibName,[],'OverwriteIfChangedOnDisk',true);
 
 % Delete intermediate SSC library
 cd(fullfile(projRoot, "toolbox", "dlsimulink", "csl", "library"))
