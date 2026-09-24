@@ -7,7 +7,7 @@ function [dp,dparr] = ploss(pipes,mdot)
 %   mdot  - Mass flow rate, double
 %
 %   Outputs:
-%   dp    - Totol pressure loss, double
+%   dp    - Total pressure loss, double
 %   dparr - Pressure loss components, double
 %
 %   The system pipe layout is represented by a length N structure
