@@ -7,7 +7,7 @@ function [dp,dparr] = ploss(pipes,mdot)
 %   mdot  - Mass flow rate, double
 %
 %   Outputs:
-%   dp - Totol pressure loss, double
+%   dp    - Totol pressure loss, double
 %   dparr - Pressure loss components, double
 %
 %   The system pipe layout is represented by a length N structure
@@ -26,7 +26,7 @@ function [dp,dparr] = ploss(pipes,mdot)
 
 arguments (Input)
     pipes (:,1) struct
-    mdot  (1,1) double = 0.0005 
+    mdot  (1,1) double
 end
 
 arguments (Output)
@@ -63,10 +63,12 @@ for i=1:length(pipes)
         f = (1.8*log10((6.9/Re) + (pipe.e/3.7*pipe.D)^1.11))^2;
     end
 
+    % Calculate pressure loss for pipe section
     dparr(i) = f * (L / pipe.D) * 0.5 * pipe.rho * vel^2 * 1e-3;
 
 end
 
+% Find total pressure loss
 dp = sum(dparr);
 
 end
