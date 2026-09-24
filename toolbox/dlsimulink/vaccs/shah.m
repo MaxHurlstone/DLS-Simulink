@@ -116,7 +116,7 @@ xavg = xout/2;
 C0 = (((1-xavg)./xavg).^0.8) * ((rhoG/rhoL)^0.5);
 
 % Recalculate heat transfer coefficient for each mass flux
-[~,h_avg] = shahcalc(Gvec,xavg,di,muL,cpL,kL,q,hLG,rhoL,C0,orien,n);
+[~,h_avg] = shahcalc(Gvec,xavg,di,muL,cpL,kL,q,hLG,rhoL,C0,orien);
 
 % Plotting
 figure()
