@@ -1,2 +1,2 @@
 % DLSimulink Toolbox
-% Version 1.2.2 06-Oct-2026
+% Version 1.2.3 07-Oct-2026
