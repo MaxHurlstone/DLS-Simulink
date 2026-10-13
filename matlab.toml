@@ -40,7 +40,6 @@ Design = [
     "dev/X.mat",
     "dev/dev.slx",
     "dev/test.m",
-    "toolbox/dlsimulink/Contents.m",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Mechanical/oscillating_translational_reference.ssc",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/contact_resistance.ssc",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/var_cond.ssc",
@@ -87,22 +86,23 @@ Artifact = [
 ]
 
 [[package]]
-configuration-name = "Toolbox1"
+configuration-name = "DLS Eng Tools"
 use-license-bsd = false
-name = ""
-version = "1.0.0"
+name = "DLS_Eng_Tools"
+version = "1.3.1"
 description = ""
 id = "bcba4546-1a86-4ef4-aa41-be10839d7b4c"
-package-root = ""
-provider.name = ""
-provider.email = ""
-provider.organization = ""
-display-name = "My Toolbox"
-summary = ""
+package-root = "toolbox/dlsimulink"
+provider.name = "Maxime Hurlstone"
+provider.email = "max.hurlstone@diamond.ac.uk"
+provider.organization = "Diamond Light Source Ltd."
+display-name = "DLS Engineering Tools"
+summary = "Engineering analysis tools for the UK National Synchrotron."
 output-file-name = "MyToolbox.mltbx"
-output-folder = "Toolbox1\\release"
+output-folder = "releases"
 supported-platforms = [
     "windows",
     "linux",
     "macos",
 ]
+lastAccessed = "1791887735375"
