@@ -40,7 +40,6 @@ Design = [
     "dev/X.mat",
     "dev/dev.slx",
     "dev/test.m",
-    "toolbox/dlsimulink/Contents.m",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Mechanical/oscillating_translational_reference.ssc",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/contact_resistance.ssc",
     "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/var_cond.ssc",
