@@ -35,7 +35,6 @@ Derived = [
 ]
 Design = [
     "buildLibrary.m",
-    "buildfile.m",
     "dev/MAGLEV_6DOF_gravComp1600.mat",
     "dev/X.mat",
     "dev/dev.slx",
@@ -88,17 +87,17 @@ Artifact = [
 [[package]]
 configuration-name = "DLS Eng Tools"
 use-license-bsd = false
-name = "DLS_Eng_Tools"
-version = "1.3.1"
+name = "DLSimulink"
+version = "2.0.0"
 description = ""
 id = "bcba4546-1a86-4ef4-aa41-be10839d7b4c"
 package-root = "toolbox/dlsimulink"
 provider.name = "Maxime Hurlstone"
 provider.email = "max.hurlstone@diamond.ac.uk"
 provider.organization = "Diamond Light Source Ltd."
-display-name = "DLS Engineering Tools"
+display-name = "DLSimulink"
 summary = "Engineering analysis tools for the UK National Synchrotron."
-output-file-name = "MyToolbox.mltbx"
+output-file-name = "dlsimulink.mltbx"
 output-folder = "releases"
 supported-platforms = [
     "windows",
@@ -106,3 +105,4 @@ supported-platforms = [
     "macos",
 ]
 lastAccessed = "1791887735375"
+preview-image-file = "images/dlsimulink.png"
