@@ -26,6 +26,9 @@ path = [
     "toolbox/dlsimulink/utils",
     "toolbox/dlsimulink/vaccs",
     "toolbox/dlsimulink/vaccs/utils",
+    "toolbox/dlsimulink/apps/SPP",
+    "toolbox/dlsimulink/apps",
+    "toolbox/dlsimulink/apps/SPP/utils",
 ]
 
 [project.labels.Classification]
@@ -104,5 +107,5 @@ supported-platforms = [
     "linux",
     "macos",
 ]
-lastAccessed = "1791895866977"
+lastAccessed = "1791908065003"
 preview-image-file = "images/dlsimulink.png"
