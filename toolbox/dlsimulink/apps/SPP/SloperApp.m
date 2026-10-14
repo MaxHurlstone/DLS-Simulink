@@ -93,7 +93,7 @@ classdef SloperApp < matlab.apps.AppBase
         function app = SloperApp
             createComponents(app)
             registerApp(app, app.UIFigure)
-            startup(app)
+            startupapp(app)
             if nargout == 0
                 clear app
             end
@@ -628,7 +628,7 @@ classdef SloperApp < matlab.apps.AppBase
     end
 
     methods (Access = private)
-        function startup(app)
+        function startupapp(app)
             app.NxxField.Value = app.DefaultNxx;
             app.NyyField.Value = app.DefaultNyy;
             app.NpField.Value = app.DefaultNp;

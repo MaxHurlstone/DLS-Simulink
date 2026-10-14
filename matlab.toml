@@ -88,7 +88,7 @@ Artifact = [
 ]
 
 [[package]]
-configuration-name = "DLS Eng Tools"
+configuration-name = "DLSimulink"
 use-license-bsd = false
 name = "DLSimulink"
 version = "2.0.1"
@@ -107,7 +107,7 @@ supported-platforms = [
     "linux",
     "macos",
 ]
-lastAccessed = "1791909211194"
+lastAccessed = "1791964954592"
 preview-image-file = "images/dlsimulink.png"
 app-gallery-files = [
     "toolbox/dlsimulink/apps/SPP/SloperApp.m",
