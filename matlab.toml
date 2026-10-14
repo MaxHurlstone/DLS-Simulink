@@ -107,7 +107,7 @@ supported-platforms = [
     "linux",
     "macos",
 ]
-lastAccessed = "1791971547536"
+lastAccessed = "1791972335469"
 preview-image-file = "images/dlsimulink.png"
 app-gallery-files = [
     "toolbox/dlsimulink/apps/SPP/SloperApp.m",
