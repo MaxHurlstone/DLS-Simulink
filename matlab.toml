@@ -91,7 +91,7 @@ Artifact = [
 configuration-name = "DLSimulink"
 use-license-bsd = false
 name = "DLSimulink"
-version = "2.0.1"
+version = "2.0.2"
 description = ""
 id = "bcba4546-1a86-4ef4-aa41-be10839d7b4c"
 package-root = "toolbox/dlsimulink"
@@ -107,7 +107,7 @@ supported-platforms = [
     "linux",
     "macos",
 ]
-lastAccessed = "1791964954592"
+lastAccessed = "1791971547536"
 preview-image-file = "images/dlsimulink.png"
 app-gallery-files = [
     "toolbox/dlsimulink/apps/SPP/SloperApp.m",
