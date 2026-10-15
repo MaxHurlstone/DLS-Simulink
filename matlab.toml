@@ -27,6 +27,8 @@ path = [
     "toolbox/dlsimulink/deb/default_disturbances",
     "toolbox/dlsimulink/examples",
     "toolbox/dlsimulink/examples/verification/DLSimscape",
+    "tests",
+    "tests/SPP",
 ]
 
 [[package]]
