@@ -40,7 +40,7 @@ supported-platforms = [
     "macos",
 ]
 display-name = "DLSimulink"
-version = "2.0.4"
+version = "2.0.5"
 id = "f1be6fd5-7861-44c4-bfec-a98ded851b12"
 use-license-bsd = false
 lastAccessed = "1792049859020"
