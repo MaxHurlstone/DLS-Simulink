@@ -12,8 +12,6 @@ classdef SloperApp < matlab.apps.AppBase
         FilePathField              matlab.ui.control.EditField
         DatasetNameLabel           matlab.ui.control.Label
         DatasetNameField           matlab.ui.control.EditField
-        DataTypeDropdown           matlab.ui.control.DropDown
-        DirectionDropdown          matlab.ui.control.DropDown
         AddDatasetButton           matlab.ui.control.Button
         DatasetListBox             matlab.ui.control.ListBox
         RemoveDatasetButton        matlab.ui.control.Button
@@ -145,21 +143,12 @@ classdef SloperApp < matlab.apps.AppBase
             app.DatasetNameField.Layout.Row = 2;
             app.DatasetNameField.Layout.Column = 2;
 
-            app.DataTypeDropdown = uidropdown(app.ImportGrid);
-            app.DataTypeDropdown.Items = {'2D', '1D'};
-            app.DataTypeDropdown.Value = '2D';
-            app.DataTypeDropdown.Tooltip = 'Select data type (2D surface or 1D profile)';
-            app.DataTypeDropdown.ValueChangedFcn = @app.DataTypeDropdownChanged;
-            app.DataTypeDropdown.Layout.Row = 3;
-            app.DataTypeDropdown.Layout.Column = 1;
-
-            app.DirectionDropdown = uidropdown(app.ImportGrid);
-            app.DirectionDropdown.Items = {'Sagittal', 'Longitudinal'};
-            app.DirectionDropdown.Value = 'Sagittal';
-            app.DirectionDropdown.Enable = false;
-            app.DirectionDropdown.Tooltip = 'Select profile direction for 1D data';
-            app.DirectionDropdown.Layout.Row = 3;
-            app.DirectionDropdown.Layout.Column = 2;
+            lbl = uilabel(app.ImportGrid);
+            lbl.Text = 'Data type: 2D surface only';
+            lbl.FontColor = [0.7, 0.7, 0.1];
+            lbl.FontWeight = 'bold';
+            lbl.Layout.Row = 3;
+            lbl.Layout.Column = [1, 2];
 
             app.AddDatasetButton = uibutton(app.ImportGrid, 'ButtonPushed', @app.AddDatasetButtonPushed);
             app.AddDatasetButton.Text = 'Add Dataset';
@@ -533,7 +522,7 @@ classdef SloperApp < matlab.apps.AppBase
             app.LinePlotAx4.Layout.Row = 2;
             app.LinePlotAx4.Layout.Column = 2;
 
-% ============ Tab 3: Comparison (1D only) ============
+% ============ Tab 3: Comparison (centrelines) ============
             app.ComparisonTab = uitab(app.TabGroup, 'Title', 'Comparison');
             app.ComparisonGrid = uigridlayout(app.ComparisonTab, [1, 2]);
             app.ComparisonGrid.RowHeight = {'1x'};
@@ -595,7 +584,7 @@ classdef SloperApp < matlab.apps.AppBase
 
             % Note label
             lbl = uilabel(app.CompLeftGrid);
-            lbl.Text = 'Note: Only 1D datasets shown.';
+            lbl.Text = 'Note: Compares centrelines — sagittal at y=0, longitudinal at x=0.';
             lbl.FontWeight = 'bold';
             lbl.FontColor = [0.7, 0.7, 0.1];
             lbl.Layout.Row = 4;
@@ -636,9 +625,6 @@ classdef SloperApp < matlab.apps.AppBase
             app.OrderField.Enable = false;
             app.FIDCheckBox.Value = app.DefaultFID;
             app.SymCheckBox.Value = app.DefaultSym;
-            app.DataTypeDropdown.Value = '2D';
-            app.DirectionDropdown.Value = 'Sagittal';
-            app.DirectionDropdown.Enable = false;
             app.DatasetDropdown.Items = {''};
             app.DatasetListBox.Items = {''};
             app.ExportDatasetDropdown.Items = {''};
@@ -684,22 +670,11 @@ classdef SloperApp < matlab.apps.AppBase
             app.DatasetListBox.Items = names;
             app.ExportDatasetDropdown.Items = names;
             delete(app.CompTree.Children);
-            parentSag = []; parentLon = [];
+            parentSag = uitreenode(app.CompTree, 'Text', 'Sagittal centreline (y=0)', 'NodeData', 0);
+            parentLon = uitreenode(app.CompTree, 'Text', 'Longitudinal centreline (x=0)', 'NodeData', 0);
             for i = 1:length(app.Datasets)
-                if app.Datasets{i}.is2D
-                    continue
-                end
-                if strcmp(app.Datasets{i}.direction, 'Longitudinal')
-                    if isempty(parentLon)
-                        parentLon = uitreenode(app.CompTree, 'Text', 'Longitudinal', 'NodeData', 0);
-                    end
-                    uitreenode(parentLon, 'Text', app.Datasets{i}.name, 'NodeData', i);
-                else
-                    if isempty(parentSag)
-                        parentSag = uitreenode(app.CompTree, 'Text', 'Sagittal', 'NodeData', 0);
-                    end
-                    uitreenode(parentSag, 'Text', app.Datasets{i}.name, 'NodeData', i);
-                end
+                uitreenode(parentSag, 'Text', app.Datasets{i}.name, 'NodeData', i);
+                uitreenode(parentLon, 'Text', app.Datasets{i}.name, 'NodeData', i);
             end
             if app.SelectedIndex > 0 && app.SelectedIndex <= length(app.Datasets)
                 app.DatasetDropdown.Value = app.Datasets{app.SelectedIndex}.name;
@@ -707,31 +682,15 @@ classdef SloperApp < matlab.apps.AppBase
             end
         end
 
-        function updateStats(app, ds, S_sag, S_lon)
-            if ds.is2D
-                rms_sag = sqrt(mean(S_sag(:).^2));
-                std_sag = std(S_sag(:));
-                rms_lon = sqrt(mean(S_lon(:).^2));
-                std_lon = std(S_lon(:));
-                app.StatsLabelSagRMS.Text = sprintf('%.3f', rms_sag);
-                app.StatsLabelSagSTD.Text = sprintf('%.3f', std_sag);
-                app.StatsLabelLonRMS.Text = sprintf('%.3f', rms_lon);
-                app.StatsLabelLonSTD.Text = sprintf('%.3f', std_lon);
-            elseif strcmp(ds.direction, 'Sagittal')
-                rms_sag = sqrt(mean(S_sag(:).^2));
-                std_sag = std(S_sag(:));
-                app.StatsLabelSagRMS.Text = sprintf('%.3f', rms_sag);
-                app.StatsLabelSagSTD.Text = sprintf('%.3f', std_sag);
-                app.StatsLabelLonRMS.Text = 'N/A';
-                app.StatsLabelLonSTD.Text = 'N/A';
-            else
-                rms_lon = sqrt(mean(S_lon(:).^2));
-                std_lon = std(S_lon(:));
-                app.StatsLabelSagRMS.Text = 'N/A';
-                app.StatsLabelSagSTD.Text = 'N/A';
-                app.StatsLabelLonRMS.Text = sprintf('%.3f', rms_lon);
-                app.StatsLabelLonSTD.Text = sprintf('%.3f', std_lon);
-            end
+        function updateStats(app, S_sag, S_lon)
+            rms_sag = sqrt(mean(S_sag(:).^2));
+            std_sag = std(S_sag(:));
+            rms_lon = sqrt(mean(S_lon(:).^2));
+            std_lon = std(S_lon(:));
+            app.StatsLabelSagRMS.Text = sprintf('%.3f', rms_sag);
+            app.StatsLabelSagSTD.Text = sprintf('%.3f', std_sag);
+            app.StatsLabelLonRMS.Text = sprintf('%.3f', rms_lon);
+            app.StatsLabelLonSTD.Text = sprintf('%.3f', std_lon);
         end
 
         function updateAnalysis(app)
@@ -742,20 +701,17 @@ classdef SloperApp < matlab.apps.AppBase
             ds = app.Datasets{app.SelectedIndex};
             try
                 data0 = ds.data0;
-                if ~ds.is2D && strcmp(ds.direction, 'Longitudinal')
-                    data0 = data0(:, [1, 3, 2, 4, 5, 6, 7]);
-                end
 
                 [X, Y, U, V, W, S_lon, S_sag, x, y, u, v, w] = ...
                     sloper(data0, app.NxxField.Value, app.NyyField.Value, ...
                     app.FIDCheckBox.Value, int16(app.OrderField.Value), ...
-                    app.SymCheckBox.Value, ds.is2D);
+                    app.SymCheckBox.Value);
 
                 ds.sloperOutputs = {X, Y, U, V, W, S_lon, S_sag, x, y, u, v, w};
                 app.Datasets{app.SelectedIndex} = ds;
 
-                app.updatePlots(ds, X, Y, W, S_sag, S_lon);
-                app.updateStats(ds, S_sag, S_lon);
+                app.updatePlots(X, Y, W, S_sag, S_lon);
+                app.updateStats(S_sag, S_lon);
                 app.AnalysisStatusLabel.Text = 'Analysis updated successfully';
                 app.AnalysisStatusLabel.FontColor = [0, 0.5, 0];
             catch ME
@@ -764,46 +720,9 @@ classdef SloperApp < matlab.apps.AppBase
             end
         end
 
-        function updatePlots(app, ds, X, Y, W, S_sag, S_lon)
-            if ds.is2D
-                app.plotContour2D(X, Y, S_sag, S_lon);
-                app.plotLines2D(X, Y, W, S_sag, S_lon);
-
-                app.ContourPlotSag.Layout.Row = 1;
-                app.ContourPlotSag.Layout.Column = 1;
-                app.ContourPlotLon.Layout.Row = 2;
-                app.ContourPlotLon.Layout.Column = 1;
-                app.ContourPlotLon.Visible = 'on';
-
-                app.LinePlotAx1.Layout.Row = 1;
-                app.LinePlotAx1.Layout.Column = 1;
-                app.LinePlotAx2.Layout.Row = 1;
-                app.LinePlotAx2.Layout.Column = 2;
-                app.LinePlotAx3.Layout.Row = 2;
-                app.LinePlotAx3.Layout.Column = 1;
-                app.LinePlotAx4.Layout.Row = 2;
-                app.LinePlotAx4.Layout.Column = 2;
-                app.LinePlotAx2.Visible = 'on';
-                app.LinePlotAx3.Visible = 'on';
-                app.LinePlotAx4.Visible = 'on';
-            else
-                app.plot1D(ds, X, Y, W, S_sag, S_lon);
-
-                colorbar(app.ContourPlotLon, 'off');
-                cla(app.ContourPlotLon);
-                app.ContourPlotLon.Visible = 'off';
-                app.ContourPlotSag.Layout.Row = [1, 2];
-                app.ContourPlotSag.Layout.Column = 1;
-
-                cla(app.LinePlotAx2);
-                app.LinePlotAx2.Visible = 'off';
-                cla(app.LinePlotAx3);
-                app.LinePlotAx3.Visible = 'off';
-                cla(app.LinePlotAx4);
-                app.LinePlotAx4.Visible = 'off';
-                app.LinePlotAx1.Layout.Row = [1, 2];
-                app.LinePlotAx1.Layout.Column = [1, 2];
-            end
+        function updatePlots(app, X, Y, W, S_sag, S_lon)
+            app.plotContour2D(X, Y, S_sag, S_lon);
+            app.plotLines2D(X, Y, W, S_sag, S_lon);
         end
 
         function plotContour2D(app, X, Y, S_sag, S_lon)
@@ -875,40 +794,6 @@ classdef SloperApp < matlab.apps.AppBase
             grid(app.LinePlotAx4, 'on');
         end
 
-        function plot1D(app, ds, X, Y, W, S_sag, S_lon)
-            cla(app.ContourPlotSag);
-            cla(app.LinePlotAx1);
-            colorbar(app.ContourPlotSag, 'off');
-            colorbar(app.LinePlotAx1, 'off');
-
-            s = app.getUnitScale();
-            ul = app.getUnitLabel();
-
-            if strcmp(ds.direction, 'Sagittal')
-                posLabel = 'Sag. (x) [mm]';
-                deformTitle = 'Sagittal Deformation';
-                slopeTitle = 'Sagittal Slope [urad]';
-            else
-                posLabel = 'Lon. (y) [mm]';
-                deformTitle = 'Longitudinal Deformation';
-                slopeTitle = 'Longitudinal Slope [urad]';
-            end
-
-            pos = X(:,1);
-
-            plot(app.ContourPlotSag, pos, W(:,1) * s, 'k-', 'LineWidth', 1.5);
-            xlabel(app.ContourPlotSag, posLabel, 'FontSize', 11);
-            ylabel(app.ContourPlotSag, ['Normal Disp. [' ul ']'], 'FontSize', 11);
-            title(app.ContourPlotSag, deformTitle, 'FontSize', 11);
-            grid(app.ContourPlotSag, 'on');
-
-            plot(app.LinePlotAx1, pos, S_sag(:,1), 'k-', 'LineWidth', 1.5);
-            xlabel(app.LinePlotAx1, posLabel, 'FontSize', 11);
-            ylabel(app.LinePlotAx1, 'Slope [urad]', 'FontSize', 11);
-            title(app.LinePlotAx1, slopeTitle, 'FontSize', 11);
-            grid(app.LinePlotAx1, 'on');
-        end
-
         function exportAxesGrid(app, axesList, nRows, nCols, fn)
             f = figure('Visible', 'off', 'Color', 'w');
             for i = 1:numel(axesList)
@@ -968,7 +853,7 @@ classdef SloperApp < matlab.apps.AppBase
                 ds = app.Datasets{app.SelectedIndex};
                 outputs = ds.sloperOutputs;
                 if ~isempty(outputs) && numel(outputs) >= 12
-                    app.updatePlots(ds, outputs{1}, outputs{2}, outputs{5}, outputs{6}, outputs{7});
+                    app.updatePlots(outputs{1}, outputs{2}, outputs{5}, outputs{6}, outputs{7});
                 end
             end
         end
@@ -976,57 +861,53 @@ classdef SloperApp < matlab.apps.AppBase
         function CompUnitChanged(app, src, event)
             app.CurrentUnit = src.Text;
             app.setActiveUnitButton(src, true);
-            idxList = app.getCheckedDatasetIndices();
-            if numel(idxList) >= 2
-                app.doComparison(idxList);
+            pairs = app.getCheckedDatasetPairs();
+            if numel(pairs) >= 2
+                direction = pairs{1}{2};
+                idxList = [];
+                for k = 1:numel(pairs)
+                    idxList(end+1) = pairs{k}{1};
+                end
+                idxList = unique(idxList);
+                app.doComparison(idxList, direction);
             end
         end
 
-        function idxList = getCheckedDatasetIndices(app)
+        function pairs = getCheckedDatasetPairs(app)
             checked = app.CompTree.CheckedNodes;
-            idxList = [];
+            pairs = {};
             for k = 1:length(checked)
                 di = checked(k).NodeData;
                 if isempty(di) || ~isnumeric(di) || di < 1
                     continue
                 end
-                idxList(end+1) = di;
+                if contains(checked(k).Parent.Text, 'Sagittal')
+                    direction = 'Sagittal';
+                else
+                    direction = 'Longitudinal';
+                end
+                pairs{end+1} = {di, direction};
             end
-            idxList = unique(idxList);
         end
 
         function CompareButtonPushed(app, src, event)
-            idxList = app.getCheckedDatasetIndices();
-            if numel(idxList) < 2
+            pairs = app.getCheckedDatasetPairs();
+            if numel(pairs) < 2
                 app.CompDeformationAx.Title.String = 'Check 2+ datasets, then press Compare';
                 cla(app.CompDeformationAx);
                 cla(app.CompSlopeAx);
                 return
             end
-            if numel(idxList) > 7
+            if numel(pairs) > 7
                 app.CompDeformationAx.Title.String = 'Maximum 7 datasets can be compared';
                 cla(app.CompDeformationAx);
                 cla(app.CompSlopeAx);
                 return
             end
 
-            dirs = {};
-            for k = 1:numel(idxList)
-                ds = app.Datasets{idxList(k)};
-                if ds.is2D
-                    app.AnalysisStatusLabel.Text = 'Comparison only supports 1D datasets';
-                    app.AnalysisStatusLabel.FontColor = [0.8, 0, 0];
-                    cla(app.CompDeformationAx);
-                    cla(app.CompSlopeAx);
-                    return
-                end
-                dirs{end+1} = ds.direction;
-                app.runAnalysisByIndex(idxList(k));
-            end
-
-            refDir = dirs{1};
-            for i = 2:length(dirs)
-                if ~strcmp(dirs{i}, refDir)
+            direction = pairs{1}{2};
+            for k = 2:numel(pairs)
+                if ~strcmp(pairs{k}{2}, direction)
                     app.AnalysisStatusLabel.Text = 'Compare sagittal-to-sagittal or longitudinal-to-longitudinal only';
                     app.AnalysisStatusLabel.FontColor = [0.8, 0, 0];
                     cla(app.CompDeformationAx);
@@ -1035,11 +916,20 @@ classdef SloperApp < matlab.apps.AppBase
                 end
             end
 
+            idxList = [];
+            for k = 1:numel(pairs)
+                idxList(end+1) = pairs{k}{1};
+            end
+            idxList = unique(idxList);
+            for k = 1:numel(idxList)
+                app.runAnalysisByIndex(idxList(k));
+            end
+
             app.AnalysisStatusLabel.Text = '';
-            app.doComparison(idxList);
+            app.doComparison(idxList, direction);
         end
 
-        function doComparison(app, idxList)
+        function doComparison(app, idxList, direction)
             cla(app.CompDeformationAx);
             cla(app.CompSlopeAx);
             s = app.getUnitScale();
@@ -1058,24 +948,23 @@ classdef SloperApp < matlab.apps.AppBase
                 if isempty(outputs) || numel(outputs) < 12
                     continue
                 end
-                Xo = outputs{1}; Wo = outputs{5}; S_sag_o = outputs{7};
+                [pos, deform, slope] = app.extractCentreline(outputs, direction);
                 c = matColors(j, :);
-
-                if strcmp(ds.direction, 'Sagittal') || ds.is2D
-                    plot(app.CompDeformationAx, Xo(:,1), Wo(:,1) * s, 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
-                    plot(app.CompSlopeAx, Xo(:,1), S_sag_o(:,1), 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
-                else
-                    plot(app.CompDeformationAx, Xo(:,1), Wo(:,1) * s, 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
-                    plot(app.CompSlopeAx, Xo(:,1), S_sag_o(:,1), 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
-                end
+                plot(app.CompDeformationAx, pos, deform * s, 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
+                plot(app.CompSlopeAx, pos, slope, 'Color', c, 'LineWidth', 1.5, 'DisplayName', ds.name);
             end
 
-            xlabel(app.CompDeformationAx, 'Position [mm]', 'FontSize', 11);
+            if strcmp(direction, 'Sagittal')
+                posLabel = 'Sag. (x) [mm]';
+            else
+                posLabel = 'Lon. (y) [mm]';
+            end
+            xlabel(app.CompDeformationAx, posLabel, 'FontSize', 11);
             ylabel(app.CompDeformationAx, ['Normal Disp. [' ul ']'], 'FontSize', 11);
             legend(app.CompDeformationAx, 'Location', 'best');
             grid(app.CompDeformationAx, 'on');
 
-            xlabel(app.CompSlopeAx, 'Position [mm]', 'FontSize', 11);
+            xlabel(app.CompSlopeAx, posLabel, 'FontSize', 11);
             ylabel(app.CompSlopeAx, 'Slope [urad]', 'FontSize', 11);
             legend(app.CompSlopeAx, 'Location', 'best');
             grid(app.CompSlopeAx, 'on');
@@ -1088,16 +977,29 @@ classdef SloperApp < matlab.apps.AppBase
             end
             try
                 data0 = ds.data0;
-                if ~ds.is2D && strcmp(ds.direction, 'Longitudinal')
-                    data0 = data0(:, [1, 3, 2, 4, 5, 6, 7]);
-                end
                 [X, Y, U, V, W, S_lon, S_sag, x, y, u, v, w] = ...
                     sloper(data0, app.NxxField.Value, app.NyyField.Value, ...
                     app.FIDCheckBox.Value, int16(app.OrderField.Value), ...
-                    app.SymCheckBox.Value, ds.is2D);
+                    app.SymCheckBox.Value);
                 ds.sloperOutputs = {X, Y, U, V, W, S_lon, S_sag, x, y, u, v, w};
                 app.Datasets{idx} = ds;
             catch
+            end
+        end
+
+        function [pos, deform, slope] = extractCentreline(app, outputs, direction)
+            X = outputs{1}; Y = outputs{2}; W = outputs{5};
+            S_lon = outputs{6}; S_sag = outputs{7};
+            if strcmp(direction, 'Sagittal')          % y ≈ 0 column
+                [~, j0] = min(abs(Y(1, :)));
+                pos    = X(:, j0);
+                deform = W(:, j0);
+                slope  = S_sag(:, j0);
+            else                                      % x ≈ 0 row
+                [~, i0] = min(abs(X(:, 1)));
+                pos    = Y(i0, :).';
+                deform = W(i0, :).';
+                slope  = S_lon(i0, :).';
             end
         end
     end
@@ -1110,11 +1012,6 @@ classdef SloperApp < matlab.apps.AppBase
                 return
             end
             app.FilePathField.Value = fullfile(p, f);
-        end
-
-        function DataTypeDropdownChanged(app, src, event)
-            is1D = strcmp(app.DataTypeDropdown.Value, '1D');
-            app.DirectionDropdown.Enable = is1D;
         end
 
         function ExportDatasetDropdownChanged(app, src, event)
@@ -1150,11 +1047,12 @@ classdef SloperApp < matlab.apps.AppBase
                 data0 = readmatrix(fpath, 'FileType', 'text', 'Delimiter', '\t', 'NumHeaderLines', 1);
                 data0 = unique(data0, 'rows');
 
-                is2D = strcmp(app.DataTypeDropdown.Value, '2D');
-                direction = app.DirectionDropdown.Value;
+                if numel(unique(round(data0(:, 2), 6))) <= 1 || numel(unique(round(data0(:, 3), 6))) <= 1
+                    app.ExportStatusLabel.Text = 'File looks like a 1D profile; only 2D surface data accepted.';
+                    return
+                end
 
-                ds = struct('name', name, 'filepath', fpath, 'data0', data0, ...
-                    'is2D', is2D, 'direction', direction, 'sloperOutputs', {{}});
+                ds = struct('name', name, 'filepath', fpath, 'data0', data0, 'sloperOutputs', {{}});
                 app.Datasets{end+1} = ds;
                 app.SelectedIndex = length(app.Datasets);
                 app.refreshDatasetDropdowns();
@@ -1214,8 +1112,6 @@ classdef SloperApp < matlab.apps.AppBase
             for i = 1:length(app.Datasets)
                 if strcmp(app.Datasets{i}.name, val)
                     app.SelectedIndex = i;
-                    ds = app.Datasets{app.SelectedIndex};
-                    app.SymCheckBox.Enable = ds.is2D;
                     app.updateAnalysis();
                     break
                 end
@@ -1288,13 +1184,7 @@ classdef SloperApp < matlab.apps.AppBase
             x  = outputs{8};   y  = outputs{9};   u = outputs{10}; v = outputs{11}; w = outputs{12};
 
             dateStr = string(datetime('now', 'TimeZone', 'local', 'Format', 'dMMMyy'));
-            if ds.is2D
-                dimLabel = '2D';
-            elseif strcmp(ds.direction, 'Sagittal')
-                dimLabel = '1D-sag';
-            else
-                dimLabel = '1D-lon';
-            end
+            dimLabel = '2D';
             expname = strjoin(["FEA", dver, blname, optname, scename, dimLabel, dateStr], '-');
 
             prefix = strjoin(["FEA", dver, blname, optname, scename], '-');
@@ -1311,14 +1201,9 @@ classdef SloperApp < matlab.apps.AppBase
                 drawnow;
                 pause(0.05);
                 fn = fullfile(expdir, expname);
-                if ds.is2D
-                    exportgraphics(app.ContourPlotSag, fn + '-SagittalSlope.png', 'Resolution', 150);
-                    exportgraphics(app.ContourPlotLon, fn + '-LongitudinalSlope.png', 'Resolution', 150);
-                    app.exportAxesGrid({app.LinePlotAx1, app.LinePlotAx2, app.LinePlotAx3, app.LinePlotAx4}, 2, 2, fn + '-LinePlots.png');
-                else
-                    exportgraphics(app.ContourPlotSag, fn + '-Deformation.png', 'Resolution', 150);
-                    exportgraphics(app.LinePlotAx1, fn + '-Slope.png', 'Resolution', 150);
-                end
+                exportgraphics(app.ContourPlotSag, fn + '-SagittalSlope.png', 'Resolution', 150);
+                exportgraphics(app.ContourPlotLon, fn + '-LongitudinalSlope.png', 'Resolution', 150);
+                app.exportAxesGrid({app.LinePlotAx1, app.LinePlotAx2, app.LinePlotAx3, app.LinePlotAx4}, 2, 2, fn + '-LinePlots.png');
 
                 app.AnalysisStatusLabel.Text = ['Exported: ' expname];
                 app.AnalysisStatusLabel.FontColor = [0, 0.5, 0];

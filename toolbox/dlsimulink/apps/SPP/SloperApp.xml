@@ -47,13 +47,9 @@
                   <edit-field class="matlab.ui.control.EditField" id="DatasetNameField" value="">
                     <layout row="2" column="2"/>
                   </edit-field>
-                  <drop-down class="matlab.ui.control.DropDown" id="DataTypeDropdown" items="2D;1D" value="2D" tooltip="Select data type (2D surface or 1D profile)">
-                    <callback event="ValueChanged" method="DataTypeDropdownChanged"/>
-                    <layout row="3" column="1"/>
-                  </drop-down>
-                  <drop-down class="matlab.ui.control.DropDown" id="DirectionDropdown" items="Sagittal;Longitudinal" value="Sagittal" enabled="false" tooltip="Select profile direction for 1D data">
-                    <layout row="3" column="2"/>
-                  </drop-down>
+                  <label text="Data type: 2D surface only" fontWeight="bold">
+                    <layout row="3" column="1" columnSpan="2"/>
+                  </label>
                   <button class="matlab.ui.control.Button" id="AddDatasetButton" text="Add Dataset" buttonStyle="primary">
                     <callback event="ButtonPushed" method="AddDatasetButtonPushed"/>
                     <layout row="4" column="1" columnSpan="2"/>
@@ -379,7 +375,7 @@
                         </children>
                       </grid-layout>
 
-                      <label text="Note: Only 1D datasets shown." fontWeight="bold">
+                      <label text="Note: Compares centrelines — sagittal at y=0, longitudinal at x=0." fontWeight="bold">
                         <layout row="4" column="1"/>
                       </label>
 

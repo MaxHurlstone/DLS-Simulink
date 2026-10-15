@@ -1,13 +1,12 @@
-function [X,Y,U,V,W,S_lon,S_sag,x,y,u,v,w] = sloper(data0,Nxx,Nyy,FID,order,sym,is2D)
+function [X,Y,U,V,W,S_lon,S_sag,x,y,u,v,w] = sloper(data0,Nxx,Nyy,FID,order,sym)
 
 arguments (Input)
     data0 (:,:) double
     Nxx (1,1) double = 100
-    Nyy (1,1) double = 20
+    Nyy (1,1) double {mustBePositive} = 20
     FID (1,1) logical = 0
     order (1,1) int16 = 3
     sym (1,1) logical = 0
-    is2D (1,1) logical = 1
 end
 
 arguments (Output)
@@ -27,11 +26,6 @@ end
 
 try
 
-if ~is2D
-    Nyy = 1;
-    sym = false;
-end
-
 x = data0(:,2);
 y = data0(:,3);
 u = data0(:,5);
@@ -50,20 +44,9 @@ yv = linspace(ymin,ymax,Nyy);
 X = X.';
 Y = Y.';
 
-if is2D
-    U = griddata(x,y,u,X,Y,'linear');
-    V = griddata(x,y,v,X,Y,'linear');
-    W = griddata(x,y,w,X,Y,'linear');
-else
-    [x, sortIdx] = sort(x);
-    y = y(sortIdx);
-    u = u(sortIdx);
-    v = v(sortIdx);
-    w = w(sortIdx);
-    U = interp1(x, u, xv(:), 'linear');
-    V = interp1(x, v, xv(:), 'linear');
-    W = interp1(x, w, xv(:), 'linear');
-end
+U = griddata(x,y,u,X,Y,'linear');
+V = griddata(x,y,v,X,Y,'linear');
+W = griddata(x,y,w,X,Y,'linear');
 
 if sym
     xv = [xv, flip(xv)];
@@ -81,14 +64,9 @@ if FID
 end
 
 dx = abs(xmax - xmin)/Nxx;
-dy = abs(ymax - ymin)/max(Nyy,1);
+dy = abs(ymax - ymin)/Nyy;
 
-if is2D
-    [dWdy,dWdx] = gradient(W,dy,dx);
-else
-    dWdx = gradient(W,dx);
-    dWdy = zeros(size(W));
-end
+[dWdy,dWdx] = gradient(W,dy,dx);
 
 S_lon = 1e6 * atan(dWdy);
 S_sag = 1e6 * atan(dWdx);
