@@ -40,10 +40,10 @@ supported-platforms = [
     "macos",
 ]
 display-name = "DLSimulink"
-version = "2.0.5"
+version = "2.0.6"
 id = "f1be6fd5-7861-44c4-bfec-a98ded851b12"
-use-license-bsd = false
-lastAccessed = "1792049859020"
+use-license-bsd = true
+lastAccessed = "1792050889959"
 provider.name = "Max Hurlstone"
 provider.email = "max.hurlstone@diamond.ac.uk"
 provider.organization = "https://www.diamond.ac.uk/Home.html"
