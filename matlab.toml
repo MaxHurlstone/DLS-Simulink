@@ -3,109 +3,53 @@ name = "dlsimulink-local"
 [folders]
 path = [
     "dev",
-    "dev/Example Controllers",
-    "dev/example_deb_data",
-    "images",
-    "releases",
-    "toolbox",
-    "toolbox/dlsimulink",
-    "toolbox/dlsimulink/csl",
+    "toolbox/dlsimulink/apps/SPP",
+    "toolbox/dlsimulink/apps/SPP/utils",
     "toolbox/dlsimulink/csl/components",
     "toolbox/dlsimulink/csl/library",
-    "toolbox/dlsimulink/csl/library/data",
     "toolbox/dlsimulink/ctrlsimtools",
     "toolbox/dlsimulink/dcm",
     "toolbox/dlsimulink/deb",
-    "toolbox/dlsimulink/deb/default_disturbances",
-    "toolbox/dlsimulink/examples",
-    "toolbox/dlsimulink/examples/verification",
-    "toolbox/dlsimulink/examples/verification/DLSimscape",
     "toolbox/dlsimulink/examples/verification/DLSimscape/Mechanical",
     "toolbox/dlsimulink/examples/verification/DLSimscape/Thermal",
     "toolbox/dlsimulink/help",
     "toolbox/dlsimulink/utils",
     "toolbox/dlsimulink/vaccs",
     "toolbox/dlsimulink/vaccs/utils",
-    "toolbox/dlsimulink/apps/SPP",
+    "images",
+    "releases",
     "toolbox/dlsimulink/apps",
-    "toolbox/dlsimulink/apps/SPP/utils",
-]
-
-[project.labels.Classification]
-Test = [
-]
-Derived = [
-]
-Design = [
-    "buildLibrary.m",
-    "dev/MAGLEV_6DOF_gravComp1600.mat",
-    "dev/X.mat",
-    "dev/dev.slx",
-    "dev/test.m",
-    "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Mechanical/oscillating_translational_reference.ssc",
-    "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/contact_resistance.ssc",
-    "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/var_cond.ssc",
-    "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/var_mass.ssc",
-    "toolbox/dlsimulink/csl/components/+DLSimscape/+Simscape/+Thermal/var_resistance.ssc",
-    "toolbox/dlsimulink/csl/library/DLSlib.slx",
-    "toolbox/dlsimulink/csl/library/data/cryocoolerdata.sldd",
-    "toolbox/dlsimulink/csl/library/data/libdata.sldd",
-    "toolbox/dlsimulink/csl/library/slblocks.m",
-    "toolbox/dlsimulink/ctrlsimtools/bodeopts.m",
-    "toolbox/dlsimulink/ctrlsimtools/importspm.m",
-    "toolbox/dlsimulink/ctrlsimtools/loadcontrollers.m",
-    "toolbox/dlsimulink/ctrlsimtools/multidamp.m",
-    "toolbox/dlsimulink/ctrlsimtools/plotspm.m",
-    "toolbox/dlsimulink/ctrlsimtools/sisotf.m",
-    "toolbox/dlsimulink/dcm/pcone.m",
-    "toolbox/dlsimulink/deb/cps.m",
-    "toolbox/dlsimulink/deb/genpsd.m",
-    "toolbox/dlsimulink/deb/rundeb.m",
-    "toolbox/dlsimulink/examples/verification/DLSimscape/Mechanical/oscillating_translational_reference.slx",
-    "toolbox/dlsimulink/examples/verification/DLSimscape/Thermal/contact_resistance.slx",
-    "toolbox/dlsimulink/examples/verification/DLSimscape/Thermal/var_mass.slx",
-    "toolbox/dlsimulink/help/dlshelp.m",
-    "toolbox/dlsimulink/utils/dlsfft.m",
-    "toolbox/dlsimulink/vaccs/exheat.m",
-    "toolbox/dlsimulink/vaccs/ploss.m",
-    "toolbox/dlsimulink/vaccs/shah.m",
-]
-Other = [
-]
-Convenience = [
-]
-None = [
-]
-Artifact = [
-]
-
-[project.labels."Toolbox - Toolbox1"]
-"Getting Started Guide" = [
-]
-"Toolbox Image File" = [
-]
-"App Gallery File" = [
+    "toolbox",
+    "toolbox/dlsimulink",
+    "toolbox/dlsimulink/csl",
+    "toolbox/dlsimulink/examples/verification",
+    "toolbox/dlsimulink/csl/library/data",
+    "toolbox/dlsimulink/deb/default_disturbances",
+    "toolbox/dlsimulink/examples",
+    "toolbox/dlsimulink/examples/verification/DLSimscape",
 ]
 
 [[package]]
-configuration-name = "DLS Eng Tools"
-use-license-bsd = false
-name = "DLSimulink"
-version = "2.0.0"
-description = ""
-id = "bcba4546-1a86-4ef4-aa41-be10839d7b4c"
-package-root = "toolbox/dlsimulink"
-provider.name = "Maxime Hurlstone"
-provider.email = "max.hurlstone@diamond.ac.uk"
-provider.organization = "Diamond Light Source Ltd."
-display-name = "DLSimulink"
-summary = "Engineering analysis tools for the UK National Synchrotron."
+configuration-name = "DLSimulink"
 output-file-name = "dlsimulink.mltbx"
 output-folder = "releases"
+name = "dlsimulink"
 supported-platforms = [
     "windows",
     "linux",
     "macos",
 ]
-lastAccessed = "1791908065003"
+display-name = "DLSimulink"
+version = "2.0.6"
+id = "f1be6fd5-7861-44c4-bfec-a98ded851b12"
+use-license-bsd = true
+lastAccessed = "1792050889959"
+provider.name = "Max Hurlstone"
+provider.email = "max.hurlstone@diamond.ac.uk"
+provider.organization = "https://www.diamond.ac.uk/Home.html"
+summary = "Engineering tools for the UK National Synchrotron."
+package-root = "toolbox/dlsimulink"
 preview-image-file = "images/dlsimulink.png"
+app-gallery-files = [
+    "toolbox/dlsimulink/apps/SPP/SloperApp.m",
+]
