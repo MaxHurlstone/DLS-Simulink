@@ -114,15 +114,17 @@ zp_pre = 2 * Dball;
 
 % Per-coupling material and contact ellipse properties (shared by both
 % contacts of each coupling)
-S = zeros(1,3);  Ee = zeros(1,3);  Re = zeros(1,3);
+Re = zeros(1,3);
 theta_c = zeros(1,3);  alpha = zeros(1,3);  beta = zeros(1,3);
 lambda = zeros(1,3);
 
+% Material properties (identical for all couplings)
+Eg = Matgroove(Matgrv,2);  vg = Matgroove(Matgrv,3);
+Eb = Matball(Matbal,2);    vb = Matball(Matbal,3);
+S = min(Matgroove(Matgrv,1), Matball(Matbal,1));
+Ee = 1 / ((1-vg^2)/Eg + (1-vb^2)/Eb);
+
 for j = 1:3
-    Eg = Matgroove(Matgrv,2);  vg = Matgroove(Matgrv,3);
-    Eb = Matball(Matbal,2);    vb = Matball(Matbal,3);
-    S(j) = min(Matgroove(Matgrv,1), Matball(Matbal,1));
-    Ee(j) = 1 / ((1-vg^2)/Eg + (1-vb^2)/Eb);
     Re(j) = 1 / (1/Rgrv(j) + 1/Rbminor(j) + 1/Rbmajor(j));
     ct = Re(j) * sqrt((1/Rgrv(j))^2 + (1/Rbmajor(j)-1/Rbminor(j))^2 ...
         + 2*(-1/Rgrv(j))*(1/Rbmajor(j)-1/Rbminor(j)));
@@ -152,7 +154,7 @@ Bwithloads = [-(sum(Fpx) + FLx); ...
 % RHS without applied loads (preload only)
 Bnoloads = [-sum(Fpx); -sum(Fpy); -sum(Fpz); ...
     -(-sum(Fpy .* zp_pre) + sum(Fpz .* yp_pre)); ...
-    -(sum(Fpx .* zp_pre) - sum(Fpz .* xp_pre)); .C0//ap..
+    -(sum(Fpx .* zp_pre) - sum(Fpz .* xp_pre));
     -(-sum(Fpx .* yp_pre) + sum(Fpy .* xp_pre))];
 
 % Contact forces: with loads (Fbn) and preload-only (Fb)
@@ -164,8 +166,8 @@ Fb  = A \ Bnoloads;
 del = zeros(1,6);
 for c = 1:6
     j = ceil(c/2);
-    del(c) = lambda(j)*(2*Fbn(c)^2/(3*Re(j)*Ee(j)^2))^(1/3) ...
-           - lambda(j)*(2*Fb(c)^2/(3*Re(j)*Ee(j)^2))^(1/3);
+    del(c) = lambda(j)*(2*Fbn(c)^2/(3*Re(j)*Ee^2))^(1/3) ...
+           - lambda(j)*(2*Fb(c)^2/(3*Re(j)*Ee^2))^(1/3);
 end
 
 % ----- Contact ellipse radii --------------------------------------
@@ -173,8 +175,8 @@ rmaj = zeros(1,6);
 rmin = zeros(1,6);
 for c = 1:6
     j = ceil(c/2);
-    rmaj(c) = alpha(j)*(1.5*Fbn(c)*Re(j)/Ee(j))^(1/3);
-    rmin(c) = beta(j)*(1.5*Fbn(c)*Re(j)/Ee(j))^(1/3);
+    rmaj(c) = alpha(j)*(1.5*Fbn(c)*Re(j)/Ee)^(1/3);
+    rmin(c) = beta(j)*(1.5*Fbn(c)*Re(j)/Ee)^(1/3);
 end
 
 % ----- Contact stresses -------------------------------------------
@@ -332,12 +334,12 @@ fprintf('  sig-four  = %.2e Pa\n', sig(4));
 fprintf('  sig-five  = %.2e Pa\n', sig(5));
 fprintf('  sig-six   = %.2e Pa\n', sig(6));
 fprintf('\n--- Stress Ratios ---\n');
-fprintf('  sig/S-one   = %.3f\n', sig(1)/S(1));
-fprintf('  sig/S-two   = %.3f\n', sig(2)/S(1));
-fprintf('  sig/S-three = %.3f\n', sig(3)/S(2));
-fprintf('  sig/S-four  = %.3f\n', sig(4)/S(2));
-fprintf('  sig/S-five  = %.3f\n', sig(5)/S(3));
-fprintf('  sig/S-six   = %.3f\n', sig(6)/S(3));
+fprintf('  sig/S-one   = %.3f\n', (0.3*sig(1))/(0.5*S));
+fprintf('  sig/S-two   = %.3f\n', (0.3*sig(2))/(0.5*S));
+fprintf('  sig/S-three = %.3f\n', (0.3*sig(3))/(0.5*S));
+fprintf('  sig/S-four  = %.3f\n', (0.3*sig(4))/(0.5*S));
+fprintf('  sig/S-five  = %.3f\n', (0.3*sig(5))/(0.5*S));
+fprintf('  sig/S-six   = %.3f\n', (0.3*sig(6))/(0.5*S));
 fprintf('\n--- Hertz Theory Ratios (> 5 recommended) ---\n');
 fprintf('  ratio1 = %.3f\n', ratio1);
 fprintf('  ratio2 = %.3f\n', ratio2);
