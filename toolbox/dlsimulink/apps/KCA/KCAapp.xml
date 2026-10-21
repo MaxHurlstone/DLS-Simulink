@@ -20,7 +20,7 @@
                             <Row>1</Row>
                         </Layout>
                         <Padding>[6 6 6 6]</Padding>
-                        <RowHeight>{'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit'}</RowHeight>
+                        <RowHeight>{'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit'}</RowHeight>
                         <RowSpacing>4</RowSpacing>
                         <Scrollable>'on'</Scrollable>
                         <Children>
@@ -522,45 +522,54 @@
                                 </Layout>
                                 <Text>'PRELOAD'</Text>
                             </Label>
-                            <Label name='Fpx1Label'>
+                            <CheckBox name='PreloadAtBallCheckBox'>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>39</Row>
+                                </Layout>
+                                <Text>'Preload at Ball Locations'</Text>
+                                <Value>false</Value>
+                                <ValueChangedFcn>onPreloadAtBallChanged</ValueChangedFcn>
+                            </CheckBox>
+                            <Label name='Fpx1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>40</Row>
                                 </Layout>
                                 <Text>'Fpx1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx1'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>39</Row>
+                                    <Row>40</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpy1Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>40</Row>
+                                    <Row>41</Row>
                                 </Layout>
                                 <Text>'Fpy1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy1'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>40</Row>
+                                    <Row>41</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpz1Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>41</Row>
+                                    <Row>42</Row>
                                 </Layout>
                                 <Text>'Fpz1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz1'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>41</Row>
+                                    <Row>42</Row>
                                 </Layout>
                                 <Value>-100</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -568,14 +577,14 @@
                             <Label name='rp_pre1Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>42</Row>
+                                    <Row>43</Row>
                                 </Layout>
                                 <Text>'rp1 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre1'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>42</Row>
+                                    <Row>43</Row>
                                 </Layout>
                                 <Value>0.025</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -583,14 +592,14 @@
                             <Label name='thp_pre1Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>43</Row>
+                                    <Row>44</Row>
                                 </Layout>
                                 <Text>'thp1 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre1'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>43</Row>
+                                    <Row>44</Row>
                                 </Layout>
                                 <Value>1.5707963267949</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -598,42 +607,42 @@
                             <Label name='Fpx2Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>44</Row>
+                                    <Row>45</Row>
                                 </Layout>
                                 <Text>'Fpx2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx2'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>44</Row>
+                                    <Row>45</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpy2Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>45</Row>
+                                    <Row>46</Row>
                                 </Layout>
                                 <Text>'Fpy2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy2'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>45</Row>
+                                    <Row>46</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpz2Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>46</Row>
+                                    <Row>47</Row>
                                 </Layout>
                                 <Text>'Fpz2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz2'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>46</Row>
+                                    <Row>47</Row>
                                 </Layout>
                                 <Value>-100</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -641,14 +650,14 @@
                             <Label name='rp_pre2Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>47</Row>
+                                    <Row>48</Row>
                                 </Layout>
                                 <Text>'rp2 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre2'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>47</Row>
+                                    <Row>48</Row>
                                 </Layout>
                                 <Value>0.025</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -656,14 +665,14 @@
                             <Label name='thp_pre2Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>48</Row>
+                                    <Row>49</Row>
                                 </Layout>
                                 <Text>'thp2 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre2'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>48</Row>
+                                    <Row>49</Row>
                                 </Layout>
                                 <Value>3.665191429</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -671,42 +680,42 @@
                             <Label name='Fpx3Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>49</Row>
+                                    <Row>50</Row>
                                 </Layout>
                                 <Text>'Fpx3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx3'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>49</Row>
+                                    <Row>50</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpy3Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>50</Row>
+                                    <Row>51</Row>
                                 </Layout>
                                 <Text>'Fpy3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy3'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>50</Row>
+                                    <Row>51</Row>
                                 </Layout>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='Fpz3Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>51</Row>
+                                    <Row>52</Row>
                                 </Layout>
                                 <Text>'Fpz3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz3'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>51</Row>
+                                    <Row>52</Row>
                                 </Layout>
                                 <Value>-100</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -714,14 +723,14 @@
                             <Label name='rp_pre3Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>52</Row>
+                                    <Row>53</Row>
                                 </Layout>
                                 <Text>'rp3 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre3'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>52</Row>
+                                    <Row>53</Row>
                                 </Layout>
                                 <Value>0.025</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
@@ -729,14 +738,14 @@
                             <Label name='thp_pre3Label'>
                                 <Layout>
                                     <Column>1</Column>
-                                    <Row>53</Row>
+                                    <Row>54</Row>
                                 </Layout>
                                 <Text>'thp3 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre3'>
                                 <Layout>
                                     <Column>2</Column>
-                                    <Row>53</Row>
+                                    <Row>54</Row>
                                 </Layout>
                                 <Value>5.759586532</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
