@@ -270,14 +270,11 @@ Ttt = dz(1)/Aone;
 Tto = dz(2)/Atwo;
 Tot = dz(3)/Athree;
 
-% Coupling centroid calculations
-AmtwoO   = Att+Angtwo/2;
-AmthreeO = Ato+Angthree/2;
-AbtwoO   = ybO(2)-tan(pi*AmtwoO/180)*xbO(2);
-AbthreeO = ybO(3)-tan(pi*AmthreeO/180)*xbO(3);
-
-xci = (AbthreeO-AbtwoO)/(pi*(AmtwoO-AmthreeO)/180);
-yci = (pi*AmtwoO/180)*xci+AbtwoO;
+% Coupling centroid (incenter) — use kinematicTriangle for correct
+% angle bisector geometry (not the arithmetic mean of vertices)
+tri = kinematicTriangle(xbO, ybO);
+xci = tri.xci;
+yci = tri.yci;
 zci = (zbO(1)+zbO(2)+zbO(3))/3;
 
 % Ball-centroid distances

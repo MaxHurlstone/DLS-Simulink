@@ -195,82 +195,79 @@ classdef KCAapp < matlab.apps.App
         function updateSchematic(app, r, th, xbO, ybO, Fbn, Fb, sig, S, DeltaX, DeltaY, DeltaZ, DeltaRMS)
             % updateSchematic  Refresh the coupling layout visualization.
             % Draws three line groups on the schematic axes:
-            %   a) Groove direction lines (blue) — from each coupling point
-            %      to the centroid
-            %   b) Coupling triangle (green) — edges joining the three
-            %      coupling positions
-            %   c) Normal force plane triangle (red) — the triangle formed
-            %      by the lines perpendicular to the groove direction at
-            %      each coupling point
-            % Markers are uniform red circles. Axis limits auto-scale
-            % with 30 % padding around all plotted points.
+            %   a) Groove direction lines (black) — from each ball center
+            %      toward the incenter along the angle bisector
+            %   b) Coupling triangle (blue dashed) — edges joining the
+            %      three ball-center positions
+            %   c) Normal force plane triangle (red dashed) — lines
+            %      perpendicular to the angle bisectors at each ball
+            %      center; pairwise intersections form a second triangle
+            % Groove directions are the angle bisectors from
+            % kinematicTriangle(), which handles non-equilateral triangles
+            % correctly (the incenter is NOT the arithmetic mean of vertices
+            % for asymmetric couplings).
             ax = app.SchematicAxes;
             cla(ax);
             hold(ax, 'on');
             xPos = r.*cos(th);
             yPos = r.*sin(th);
-            midX = mean(xbO);
-            midY = mean(ybO);
 
-            % (a) Groove direction lines — from each coupling to centroid
+            % Triangle geometry via kinematicTriangle — proper incenter and
+            % angle bisectors (not the centroid or radial approximation)
+            tri = kinematicTriangle(xbO, ybO);
+            xci = tri.xci;
+            yci = tri.yci;
+
+            % (a) Groove direction lines — ball center to incenter
             for j = 1:3
-                plot(ax, [xPos(j), midX], [yPos(j), midY], 'k-');
+                plot(ax, [xbO(j), xci], [ybO(j), yci], 'k-', 'LineWidth', 1.5);
             end
 
-            % (b) Coupling triangle — connect the three points
-            plot(ax, [xPos(1), xPos(2), xPos(3), xPos(1)], ...
-                [yPos(1), yPos(2), yPos(3), yPos(1)], ...
-                'b--');
+            % (b) Coupling triangle — ball-center edges
+            plot(ax, [xbO(1), xbO(2), xbO(3), xbO(1)], ...
+                [ybO(1), ybO(2), ybO(3), ybO(1)], ...
+                'b--', 'LineWidth', 1.5);
 
-            % (c) Normal force plane triangle — lines perpendicular to
-            %     groove direction at each coupling point
-            normalAng = th + pi/2;
-            nx = cos(normalAng);
-            ny = sin(normalAng);
+            % (c) Normal force plane triangle — lines perpendicular to each
+            %     angle bisector; pairwise intersections form the vertices
             nTriX = zeros(1, 3);
             nTriY = zeros(1, 3);
             for j = 1:3
                 j2 = mod(j, 3) + 1;
-                M = [nx(j), -nx(j2); ny(j), -ny(j2)];
-                dp = [xPos(j2) - xPos(j); yPos(j2) - yPos(j)];
+                M = [tri.normalX(j), -tri.normalX(j2); ...
+                    tri.normalY(j), -tri.normalY(j2)];
+                dp = [xbO(j2) - xbO(j); ybO(j2) - ybO(j)];
                 t = M \ dp;
-                nTriX(j) = xPos(j) + t(1) * nx(j);
-                nTriY(j) = yPos(j) + t(1) * ny(j);
+                nTriX(j) = xbO(j) + t(1) * tri.normalX(j);
+                nTriY(j) = ybO(j) + t(1) * tri.normalY(j);
             end
             plot(ax, [nTriX(1), nTriX(2), nTriX(3), nTriX(1)], ...
                 [nTriY(1), nTriY(2), nTriY(3), nTriY(1)], ...
-                'r--');
+                'r--', 'LineWidth', 1.5);
 
-            % Coupling point markers (uniform red circles)
+            % Coupling point markers (uniform red circles) with contact pair labels
             for j = 1:3
                 k = 2*j - 1;
-
-                if j == 1
-                    a = 1; b = 2;
-                elseif j == 2
-                    a = 3; b = 4;
-                elseif j == 3
-                    a = 5; b = 6;
-                end
-
+                if j == 1; a = 1; b = 2;
+                elseif j == 2; a = 3; b = 4;
+                elseif j == 3; a = 5; b = 6; end
                 plot(ax, xPos(j), yPos(j), 'ro', 'MarkerSize', 12, 'LineWidth', 2);
-                text(ax, 1.05*xPos(j), 1.05*yPos(j), sprintf('  %d (%d,%d)', j, a, b), 'FontSize', 16, 'FontWeight', 'bold');
-                avgFb = (Fb(k) + Fb(k+1))/2;
-                avgSig = (sig(k) + sig(k+1))/2;
-                % text(ax, 1.2*xPos(j), 1.2*yPos(j), ...
-                %     sprintf('F_{b} = %.1f N\ns = %.2e Pa', avgFb, avgSig), ...
-                %     'FontSize', 12, 'Interpreter', 'tex');
+                text(ax, 1.05*xPos(j), 1.05*yPos(j), ...
+                    sprintf('  %d (%d,%d)', j, a, b), ...
+                    'FontSize', 16, 'FontWeight', 'bold');
             end
 
-            % Centroid marker
-            plot(ax, midX, midY,'o', 'MarkerSize', 10, 'MarkerFaceColor', 'k', 'MarkerEdgeColor','k');
-            text(ax, 1.05*midX, 1.05*midY, '  Centroid', 'FontSize', 12, 'FontWeight', 'bold');
+            % Incenter marker
+            plot(ax, xci, yci, 'o', 'MarkerSize', 10, ...
+                'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k');
+            text(ax, 1.05*xci, 1.05*yci, '  Incenter', ...
+                'FontSize', 12, 'FontWeight', 'bold');
 
-            % Auto-scale with padding
-            allPts = [xPos, midX];
+            % Auto-scale with padding around all points
+            allPts = [xbO, xci];
             xRng = max(allPts) - min(allPts);
             xPad = 0.3 * xRng;
-            allPtsY = [yPos, midY];
+            allPtsY = [ybO, yci];
             yRng = max(allPtsY) - min(allPtsY);
             yPad = 0.3 * yRng;
             xlim(ax, [min(allPts) - xPad, max(allPts) + xPad]);

@@ -29,6 +29,7 @@ path = [
     "toolbox/dlsimulink/examples/verification/DLSimscape",
     "toolbox/dlsimulink/apps/KCA/prototype",
     "toolbox/dlsimulink/apps/KCA",
+    "toolbox/dlsimulink/apps/KCA/utils",
 ]
 
 [[package]]
