@@ -30,6 +30,7 @@ path = [
     "toolbox/dlsimulink/apps/KCA/prototype",
     "toolbox/dlsimulink/apps/KCA",
     "toolbox/dlsimulink/apps/KCA/utils",
+    "toolbox/dlsimulink/apps/KCA/refs",
 ]
 
 [[package]]
