@@ -7,7 +7,7 @@
         <Children>
             <GridLayout name='RootGrid'>
                 <ColumnSpacing>0</ColumnSpacing>
-                <ColumnWidth>{260, '1x'}</ColumnWidth>
+                <ColumnWidth>{320, '1x'}</ColumnWidth>
                 <Padding>[0 0 0 0]</Padding>
                 <RowHeight>{'1x'}</RowHeight>
                 <RowSpacing>0</RowSpacing>
@@ -20,7 +20,7 @@
                             <Row>1</Row>
                         </Layout>
                         <Padding>[6 6 6 6]</Padding>
-                        <RowHeight>{'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit'}</RowHeight>
+                        <RowHeight>{'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</RowHeight>
                         <RowSpacing>4</RowSpacing>
                         <Scrollable>'on'</Scrollable>
                         <Children>
@@ -40,8 +40,8 @@
                                 <Text>'Ball:'</Text>
                             </Label>
                             <DropDown name='BallDropdown'>
-                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'Other'}</Items>
-                                <Layout>
+                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'AMS 5629 (H950)'}</Items>
+<Layout>
                                     <Column>2</Column>
                                     <Row>2</Row>
                                 </Layout>
@@ -56,12 +56,12 @@
                                 <Text>'Groove:'</Text>
                             </Label>
                             <DropDown name='GrooveDropdown'>
-                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'Other'}</Items>
+                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'AMS 5629 (H950)'}</Items>
                                 <Layout>
                                     <Column>2</Column>
                                     <Row>3</Row>
                                 </Layout>
-                                <Value>'RC62 Steel'</Value>
+                                <Value>'AMS 5629 (H950)'</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </DropDown>
                             <Button name='AddCustomButton'>
@@ -94,7 +94,7 @@
                                     <Column>1</Column>
                                     <Row>7</Row>
                                 </Layout>
-                                <Text>'r [m]:'</Text>
+                                <Text>'Radius [m]:'</Text>
                             </Label>
                             <NumericEditField name='r1'>
                                 <Layout>
@@ -109,7 +109,7 @@
                                     <Column>1</Column>
                                     <Row>8</Row>
                                 </Layout>
-                                <Text>'th [rad]:'</Text>
+                                <Text>'Angle [rad]:'</Text>
                             </Label>
                             <NumericEditField name='th1'>
                                 <Layout>
@@ -124,7 +124,7 @@
                                     <Column>1</Column>
                                     <Row>9</Row>
                                 </Layout>
-                                <Text>'thg [rad]:'</Text>
+                                <Text>'Groove ang [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thg1'>
                                 <Layout>
@@ -139,7 +139,7 @@
                                     <Column>1</Column>
                                     <Row>10</Row>
                                 </Layout>
-                                <Text>'Dball [m]:'</Text>
+                                <Text>'Ball D [m]:'</Text>
                             </Label>
                             <NumericEditField name='Dball1'>
                                 <Layout>
@@ -154,7 +154,7 @@
                                     <Column>1</Column>
                                     <Row>11</Row>
                                 </Layout>
-                                <Text>'Rgrv [m]:'</Text>
+                                <Text>'Groove R [m]:'</Text>
                             </Label>
                             <NumericEditField name='Rgrv1'>
                                 <Layout>
@@ -177,13 +177,13 @@
                                     <Column>1</Column>
                                     <Row>13</Row>
                                 </Layout>
-                                <Text>'r [m]:'</Text>
+<Text>'Radius [m]:'</Text>
                             </Label>
                             <NumericEditField name='r2'>
-                                <Layout>
-                                    <Column>2</Column>
-                                    <Row>13</Row>
-                                </Layout>
+                            <Layout>
+                                <Column>2</Column>
+                                <Row>13</Row>
+                            </Layout>
                                 <Value>0.025</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
@@ -192,7 +192,7 @@
                                     <Column>1</Column>
                                     <Row>14</Row>
                                 </Layout>
-                                <Text>'th [rad]:'</Text>
+                                <Text>'Angle [rad]:'</Text>
                             </Label>
                             <NumericEditField name='th2'>
                                 <Layout>
@@ -207,7 +207,7 @@
                                     <Column>1</Column>
                                     <Row>15</Row>
                                 </Layout>
-                                <Text>'thg [rad]:'</Text>
+                                <Text>'Groove ang [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thg2'>
                                 <Layout>
@@ -222,7 +222,7 @@
                                     <Column>1</Column>
                                     <Row>16</Row>
                                 </Layout>
-                                <Text>'Dball [m]:'</Text>
+                                <Text>'Ball D [m]:'</Text>
                             </Label>
                             <NumericEditField name='Dball2'>
                                 <Layout>
@@ -237,7 +237,7 @@
                                     <Column>1</Column>
                                     <Row>17</Row>
                                 </Layout>
-                                <Text>'Rgrv [m]:'</Text>
+                                <Text>'Groove R [m]:'</Text>
                             </Label>
                             <NumericEditField name='Rgrv2'>
                                 <Layout>
@@ -275,7 +275,7 @@
                                     <Column>1</Column>
                                     <Row>20</Row>
                                 </Layout>
-                                <Text>'th [rad]:'</Text>
+                                <Text>'Angle [rad]:'</Text>
                             </Label>
                             <NumericEditField name='th3'>
                                 <Layout>
@@ -290,7 +290,7 @@
                                     <Column>1</Column>
                                     <Row>21</Row>
                                 </Layout>
-                                <Text>'thg [rad]:'</Text>
+                                <Text>'Groove ang [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thg3'>
                                 <Layout>
@@ -305,7 +305,7 @@
                                     <Column>1</Column>
                                     <Row>22</Row>
                                 </Layout>
-                                <Text>'Dball [m]:'</Text>
+                                <Text>'Ball D [m]:'</Text>
                             </Label>
                             <NumericEditField name='Dball3'>
                                 <Layout>
@@ -320,7 +320,7 @@
                                     <Column>1</Column>
                                     <Row>23</Row>
                                 </Layout>
-                                <Text>'Rgrv [m]:'</Text>
+                                <Text>'Groove R [m]:'</Text>
                             </Label>
                             <NumericEditField name='Rgrv3'>
                                 <Layout>
@@ -528,7 +528,7 @@
                                     <Row>39</Row>
                                 </Layout>
                                 <Text>'Preload at Ball Locations'</Text>
-                                <Value>false</Value>
+                                <Value>true</Value>
                                 <ValueChangedFcn>onPreloadAtBallChanged</ValueChangedFcn>
                             </CheckBox>
                             <Label name='Fpx1Label'>
@@ -536,7 +536,7 @@
                                     <Column>1</Column>
                                     <Row>40</Row>
                                 </Layout>
-                                <Text>'Fpx1 [N]:'</Text>
+                                <Text>'Force X 1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx1'>
                                 <Layout>
@@ -550,7 +550,7 @@
                                     <Column>1</Column>
                                     <Row>41</Row>
                                 </Layout>
-                                <Text>'Fpy1 [N]:'</Text>
+                                <Text>'Force Y 1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy1'>
                                 <Layout>
@@ -564,7 +564,7 @@
                                     <Column>1</Column>
                                     <Row>42</Row>
                                 </Layout>
-                                <Text>'Fpz1 [N]:'</Text>
+                                <Text>'Force Z 1 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz1'>
                                 <Layout>
@@ -579,7 +579,7 @@
                                     <Column>1</Column>
                                     <Row>43</Row>
                                 </Layout>
-                                <Text>'rp1 [m]:'</Text>
+                                <Text>'Radius 1 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre1'>
                                 <Layout>
@@ -594,7 +594,7 @@
                                     <Column>1</Column>
                                     <Row>44</Row>
                                 </Layout>
-                                <Text>'thp1 [rad]:'</Text>
+                                <Text>'Angle 1 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre1'>
                                 <Layout>
@@ -609,7 +609,7 @@
                                     <Column>1</Column>
                                     <Row>45</Row>
                                 </Layout>
-                                <Text>'Fpx2 [N]:'</Text>
+                                <Text>'Force X 2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx2'>
                                 <Layout>
@@ -623,7 +623,7 @@
                                     <Column>1</Column>
                                     <Row>46</Row>
                                 </Layout>
-                                <Text>'Fpy2 [N]:'</Text>
+                                <Text>'Force Y 2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy2'>
                                 <Layout>
@@ -637,7 +637,7 @@
                                     <Column>1</Column>
                                     <Row>47</Row>
                                 </Layout>
-                                <Text>'Fpz2 [N]:'</Text>
+                                <Text>'Force Z 2 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz2'>
                                 <Layout>
@@ -652,7 +652,7 @@
                                     <Column>1</Column>
                                     <Row>48</Row>
                                 </Layout>
-                                <Text>'rp2 [m]:'</Text>
+                                <Text>'Radius 2 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre2'>
                                 <Layout>
@@ -667,7 +667,7 @@
                                     <Column>1</Column>
                                     <Row>49</Row>
                                 </Layout>
-                                <Text>'thp2 [rad]:'</Text>
+                                <Text>'Angle 2 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre2'>
                                 <Layout>
@@ -682,7 +682,7 @@
                                     <Column>1</Column>
                                     <Row>50</Row>
                                 </Layout>
-                                <Text>'Fpx3 [N]:'</Text>
+                                <Text>'Force X 3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpx3'>
                                 <Layout>
@@ -696,7 +696,7 @@
                                     <Column>1</Column>
                                     <Row>51</Row>
                                 </Layout>
-                                <Text>'Fpy3 [N]:'</Text>
+                                <Text>'Force Y 3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpy3'>
                                 <Layout>
@@ -710,7 +710,7 @@
                                     <Column>1</Column>
                                     <Row>52</Row>
                                 </Layout>
-                                <Text>'Fpz3 [N]:'</Text>
+                                <Text>'Force Z 3 [N]:'</Text>
                             </Label>
                             <NumericEditField name='Fpz3'>
                                 <Layout>
@@ -725,7 +725,7 @@
                                     <Column>1</Column>
                                     <Row>53</Row>
                                 </Layout>
-                                <Text>'rp3 [m]:'</Text>
+                                <Text>'Radius 3 [m]:'</Text>
                             </Label>
                             <NumericEditField name='rp_pre3'>
                                 <Layout>
@@ -740,7 +740,7 @@
                                     <Column>1</Column>
                                     <Row>54</Row>
                                 </Layout>
-                                <Text>'thp3 [rad]:'</Text>
+                                <Text>'Angle 3 [rad]:'</Text>
                             </Label>
                             <NumericEditField name='thp_pre3'>
                                 <Layout>
@@ -762,14 +762,30 @@
                             <GridLayout name='MainGrid'>
                                 <ColumnWidth>{'1x'}</ColumnWidth>
                                 <Padding>[8 8 8 8]</Padding>
-                                <RowHeight>{'1x', 180}</RowHeight>
+                                <RowHeight>{55, '1x', 260}</RowHeight>
                                 <RowSpacing>8</RowSpacing>
                                 <Children>
+                                    <Panel name='InfoPanel'>
+                                    <Layout><Column>1</Column><Row>1</Row></Layout>
+                                    <Title>'Kinematic Coupling Generator — Design Tool'</Title>
+                                    <Children>
+                                        <GridLayout name='InfoGrid'>
+                                            <ColumnWidth>{'1x'}</ColumnWidth>
+                                            <RowHeight>{'fit'}</RowHeight>
+                                            <Children>
+                                                <Label name='InfoLabel'>
+                                                    <Layout><Column>1</Column><Row>1</Row></Layout>
+                                                    <Text>'Three-groove kinematic coupling design tool. Enter geometry, materials, loads, and preload to compute contact pressures, error motions, and Hertzian validity ratios.'</Text>
+                                                </Label>
+                                            </Children>
+                                        </GridLayout>
+                                    </Children>
+                                </Panel>
                                     <UIAxes name='SchematicAxes'>
                                         <Box>'on'</Box>
                                         <Layout>
                                             <Column>1</Column>
-                                            <Row>1</Row>
+                                            <Row>2</Row>
                                         </Layout>
                                         <Title>
                                             <String>'Coupling Schematic'</String>
@@ -787,7 +803,7 @@
                                         <ColumnName>{'Name'; 'Point 1'; 'Point 2'; 'Point 3'; 'Point 4'; 'Point 5'; 'Point 6'}</ColumnName>
                                         <Layout>
                                             <Column>1</Column>
-                                            <Row>2</Row>
+<Row>3</Row>
                                         </Layout>
                                     </Table>
                                 </Children>

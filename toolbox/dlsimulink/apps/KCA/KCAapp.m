@@ -16,6 +16,9 @@ classdef KCAapp < matlab.apps.App
     properties (Access = public)
         UIFigure                        matlab.ui.Figure
         RootGrid                        matlab.ui.container.GridLayout
+        InfoPanel                       matlab.ui.container.Panel
+        InfoGrid                        matlab.ui.container.GridLayout
+        InfoLabel                       matlab.ui.control.Label
         MainPanel                       matlab.ui.container.Panel
         MainGrid                        matlab.ui.container.GridLayout
         OutputTable                     matlab.ui.control.Table
@@ -126,9 +129,18 @@ classdef KCAapp < matlab.apps.App
         % CustomMaterialCount tracks user-added materials; Matball and
         % Matgroove hold the per-material property arrays that are
         % indexed by the ball/groove dropdown selections.
-        CustomMaterialCount = 0
-        Matball = [ 2758000000, 310300000000, 0.3; 103400000, 10340000000, 0.2; 1724000000, 204100000000, 0.29; 1020000000, 200000000000, 0.29; 2758000000, 310300000000, 0.3 ]
-        Matgroove = [ 2758000000, 310300000000, 0.3; 103400000, 10340000000, 0.2; 1724000000, 204100000000, 0.29; 1020000000, 200000000000, 0.29; 2758000000, 310300000000, 0.3 ]
+        CustomMaterialCount = 0;
+        Matball =  [2758000000, 310300000000, 0.3;...
+                    103400000, 10340000000, 0.2;...
+                    1724000000, 204100000000, 0.29;...
+                    1020000000, 200000000000, 0.29;...
+                    1500000000, 200000000000, 0.29];
+        %Matgroove = Matball;
+        Matgroove =  [2758000000, 310300000000, 0.3;...
+            103400000, 10340000000, 0.2;...
+            1724000000, 204100000000, 0.29;...
+            1020000000, 200000000000, 0.29;...
+            1500000000, 200000000000, 0.29];
     end
 
     methods (Access = private)
@@ -139,10 +151,11 @@ classdef KCAapp < matlab.apps.App
             % and update the schematic and output table.
             % Called from every ValueChangedFcn and from startupFcn.
 
-            % Map dropdown display names to material DB row indices
-            materialNames = {'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'Other'};
-            matbalIdx = max(1, find(strcmp(app.BallDropdown.Value, materialNames), 1));
-            matgrvIdx = max(1, find(strcmp(app.GrooveDropdown.Value, materialNames), 1));
+            % Map dropdown display names to material DB row indices.
+            % Use the dropdown's Items (includes any user-added materials).
+            items = app.BallDropdown.Items;
+            matbalIdx = max(1, find(strcmp(app.BallDropdown.Value, items), 1));
+            matgrvIdx = max(1, find(strcmp(app.GrooveDropdown.Value, items), 1));
 
             % Package UI inputs into structs for the computation engine
             materials.Matball = app.Matball;
@@ -176,14 +189,16 @@ classdef KCAapp < matlab.apps.App
 
             % Update schematic with coupling positions and computed values
             app.updateSchematic(res.r, res.th, res.xbO, res.ybO, res.Fbn, res.Fb, ...
-                res.sig, res.S, res.DeltaX, res.DeltaY, res.DeltaZ, res.DeltaRMS);
+                res.q, res.S, res.DeltaX, res.DeltaY, res.DeltaZ, res.DeltaRMS);
 
-            % Build output table: 9 rows x 7 columns (Name + 6 contact points)
-            sigS = (0.3 * res.sig) / (0.5 * res.S);
+            % Build output table: 11 rows x 7 columns (Name + 6 contact points)
+            sigS = res.sigsmax / (0.5 * res.S);
             tData = {'Fbn [N]',res.Fbn(1),res.Fbn(2),res.Fbn(3),res.Fbn(4),res.Fbn(5),res.Fbn(6);
                 'Fb [N]',res.Fb(1),res.Fb(2),res.Fb(3),res.Fb(4),res.Fb(5),res.Fb(6);
-                'sig [Pa]',res.sig(1),res.sig(2),res.sig(3),res.sig(4),res.sig(5),res.sig(6);
-                'sig/S',sigS(1),sigS(2),sigS(3),sigS(4),sigS(5),sigS(6);
+                'Contact P [Pa]',res.q(1),res.q(2),res.q(3),res.q(4),res.q(5),res.q(6);
+                'Max. Shear [Pa]',res.sigsmax(1),res.sigsmax(2),res.sigsmax(3),res.sigsmax(4),res.sigsmax(5),res.sigsmax(6);
+                'UTS [Pa]',res.S,res.S,res.S,res.S,res.S,res.S;
+                'Max. Shear / 0.5*UTS',sigS(1),sigS(2),sigS(3),sigS(4),sigS(5),sigS(6);
                 'Hertz ratio',res.ratio(1),res.ratio(1),res.ratio(2),res.ratio(2),res.ratio(3),res.ratio(3);
                 'DeltaX [um]',1e6*res.DeltaX,1e6*res.DeltaX,1e6*res.DeltaX,1e6*res.DeltaX,1e6*res.DeltaX,1e6*res.DeltaX;
                 'DeltaY [um]',1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY;
@@ -322,13 +337,21 @@ classdef KCAapp < matlab.apps.App
 
         % Value changed function: SymmetricCheckBox
         function onSymmetricChanged(app, event)
-            % Toggle coupling 2 & 3 sidebar visibility by setting the
-            % GridLayout row height to 0 (hidden) or 'fit' (shown).
+            % Toggle coupling 2 & 3 sidebar visibility. When symmetric,
+            % hide geometry rows 12-23, all preload rows 45-54 (coupling
+            % 2 & 3), and preload-at-ball rp/thp rows 48,49,53,54.
+            % After the symmetry toggle, also apply the preload checkbox
+            % state to ensure rp/thp fields are correctly shown/hidden.
             rh = app.SidebarGrid.RowHeight;
             if app.SymmetricCheckBox.Value
-                for i = 12:23; rh{i} = 0; end
+                for i = [12:23, 45:54]; rh{i} = 0; end
             else
-                for i = 12:23; rh{i} = 'fit'; end
+                for i = [12:23, 45:54]; rh{i} = 'fit'; end
+                % When symmetry is disabled, re-apply preload checkbox
+                % visibility (may hide rp/thp fields if checked)
+                if app.PreloadAtBallCheckBox.Value
+                    for i = [43,44,48,49,53,54]; rh{i} = 0; end
+                end
             end
             app.SidebarGrid.RowHeight = rh;
             app.computeResults();

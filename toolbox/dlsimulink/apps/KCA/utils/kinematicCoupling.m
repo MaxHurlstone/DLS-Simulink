@@ -37,7 +37,8 @@ function results = kinematicCoupling(materials, geometry, loads, errorPt, preloa
 % Output (results struct):
 %   .Fbn        6x1 contact forces with applied loads (N)
 %   .Fb         6x1 preload-only contact forces (N)
-%   .sig        6x1 contact stresses (Pa)
+%   .q          6x1 maximum Hertzian contact pressure (Pa)
+%   .sigsmax    6x1 maximum shear stress = 0.3*q (Pa)
 %   .S          allowable stress = min(ball, groove Hertz limits) (Pa)
 %   .ratio      3x1 Hertz theory validity ratio (>5 recommended)
 %   .DeltaX     error motion at point of interest, X (m)
@@ -203,11 +204,15 @@ for c = 1:6
     rmin(c) = beta(j)*(1.5*Fbn(c)*Re(j)/Ee)^(1/3);
 end
 
-% Contact stresses
-sig = zeros(1,6);
+% Contact pressure (q) — maximum Hertzian pressure at each contact
+q = zeros(1,6);
 for c = 1:6
-    sig(c) = 3*Fbn(c)/(2*pi*rmaj(c)*rmin(c));
+    q(c) = 3*Fbn(c)/(2*pi*rmaj(c)*rmin(c));
 end
+
+% Maximum shear stress = 0.3 * contact pressure (von Mises criterion
+% for ductile materials under Hertzian contact)
+sigsmax = 0.3 * q;
 
 % Ball center coordinates (original)
 xbO = zeros(1,3);
@@ -339,7 +344,8 @@ DeltaRMS = sqrt(DeltaX^2 + DeltaY^2 + DeltaZ^2);
 %% Package results
 results.Fbn = Fbn;
 results.Fb = Fb;
-results.sig = sig;
+results.q = q;
+results.sigsmax = sigsmax;
 results.S = S;
 results.ratio = [ratio1; ratio2; ratio3];
 results.DeltaX = DeltaX;
