@@ -26,6 +26,7 @@
                         <Children>
                             <Label name='MaterialsHeader'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>1</Row>
@@ -71,6 +72,9 @@
                                     <Row>4</Row>
                                 </Layout>
                                 <Text>'Add Custom'</Text>
+                                <BackgroundColor>[1 0.8118 0]</BackgroundColor>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <FontWeight>'bold'</FontWeight>
                             </Button>
                             <CheckBox name='SymmetricCheckBox'>
                                 <Layout>
@@ -83,6 +87,7 @@
                             </CheckBox>
                             <Label name='Coupling1Header'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>6</Row>
@@ -116,7 +121,8 @@
                                     <Column>2</Column>
                                     <Row>8</Row>
                                 </Layout>
-                                <Value>1.5707963267949</Value>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
+                                <Value>0</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
                             <Label name='thgLabel1'>
@@ -166,6 +172,7 @@
                             </NumericEditField>
                             <Label name='Coupling2Header'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>12</Row>
@@ -199,6 +206,7 @@
                                     <Column>2</Column>
                                     <Row>14</Row>
                                 </Layout>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
                                 <Value>3.665191429</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
@@ -249,6 +257,7 @@
                             </NumericEditField>
                             <Label name='Coupling3Header'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>18</Row>
@@ -282,6 +291,7 @@
                                     <Column>2</Column>
                                     <Row>20</Row>
                                 </Layout>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
                                 <Value>5.759586532</Value>
                                 <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
                             </NumericEditField>
@@ -332,6 +342,7 @@
                             </NumericEditField>
                             <Label name='LoadsHeader'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>24</Row>
@@ -466,6 +477,7 @@
                             </NumericEditField>
                             <Label name='ErrorHeader'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>34</Row>
@@ -516,6 +528,7 @@
                             </NumericEditField>
                             <Label name='PreloadHeader'>
                                 <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
                                 <Layout>
                                     <Column>1</Column>
                                     <Row>38</Row>
@@ -768,6 +781,7 @@
                                     <Panel name='InfoPanel'>
                                     <Layout><Column>1</Column><Row>1</Row></Layout>
                                     <Title>'Kinematic Coupling Generator — Design Tool'</Title>
+                                    <FontWeight>'bold'</FontWeight>
                                     <Children>
                                         <GridLayout name='InfoGrid'>
                                             <ColumnWidth>{'1x'}</ColumnWidth>

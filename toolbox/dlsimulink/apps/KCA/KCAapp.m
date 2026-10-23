@@ -163,8 +163,31 @@ classdef KCAapp < matlab.apps.App
             materials.ballIdx = matbalIdx;
             materials.grooveIdx = matgrvIdx;
 
+            % geometry.r — read UI (unchanged); engine propagates r(2:3)=r(1)
+            % when symmetric
             geometry.r = [app.r1.Value, app.r2.Value, app.r3.Value];
-            geometry.th = [app.th1.Value, app.th2.Value, app.th3.Value];
+
+            % Effective radii for the angle lock (symmetry forces r2 = r3 = r1)
+            if app.SymmetricCheckBox.Value
+                effR = [app.r1.Value, app.r1.Value, app.r1.Value];
+            else
+                effR = [app.r1.Value, app.r2.Value, app.r3.Value];
+            end
+
+            % geometry.th — compute locked angles, update UI fields for display
+            % (th1 fixed at 0). Guard against non-positive radii, which would
+            % put acos() outside its domain in kinematicAngles.
+            if any(effR <= 0) || any(~isfinite(effR))
+                warning('KCAapp:InvalidRadii', ...
+                    'Coupling radii must be finite and positive; keeping previous angles.');
+                lockedTh = [app.th1.Value, app.th2.Value, app.th3.Value];
+            else
+                lockedTh = kinematicAngles(effR, 0);        % th1 fixed at 0
+            end
+            app.th1.Value = lockedTh(1);
+            app.th2.Value = lockedTh(2);
+            app.th3.Value = lockedTh(3);
+            geometry.th = lockedTh;
             geometry.thg = [app.thg1.Value, app.thg2.Value, app.thg3.Value];
             geometry.Dball = [app.Dball1.Value, app.Dball2.Value, app.Dball3.Value];
             geometry.Rgrv = [app.Rgrv1.Value, app.Rgrv2.Value, app.Rgrv3.Value];
@@ -205,6 +228,28 @@ classdef KCAapp < matlab.apps.App
                 'DeltaZ [um]',1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ;
                 'DeltaRMS [um]',1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS};
             app.OutputTable.Data = tData;
+
+            % Color the 'Max. Shear / 0.5*UTS' row (data row 6, cols 2-7)
+            % by margin: value < 1 → dark green on light greenish-grey (OK);
+            % value > 1 → dark red on light reddish-grey (limit exceeded).
+            % Stale styles from a previous pass are cleared first.
+            if height(app.OutputTable.StyleConfigurations) > 0
+                removeStyle(app.OutputTable, 1:height(app.OutputTable.StyleConfigurations));
+            end
+            margin = [tData{6, 2:7}];
+            for c = 1:6
+                v = margin(c);
+                if v < 1
+                    s = uistyle('BackgroundColor', [0.90 0.96 0.90], ...
+                        'FontColor', [0.06 0.42 0.14]);
+                elseif v > 1
+                    s = uistyle('BackgroundColor', [0.96 0.90 0.90], ...
+                        'FontColor', [0.62 0.07 0.07]);
+                else
+                    continue;
+                end
+                addStyle(app.OutputTable, s, 'cell', [6, c + 1]);
+            end
         end
 
         function updateSchematic(app, r, th, xbO, ybO, Fbn, Fb, sig, S, DeltaX, DeltaY, DeltaZ, DeltaRMS)
@@ -303,6 +348,11 @@ classdef KCAapp < matlab.apps.App
         % Code that executes after component creation
         function startupFcn(app)
             app.computeResults();
+
+            % Angle fields are locked (computed from radii); disable user editing
+            app.th1.Enable = 'off';
+            app.th2.Enable = 'off';
+            app.th3.Enable = 'off';
         end
 
         % Value changed function: BallDropdown, Dball1, Dball2, Dball3, 
