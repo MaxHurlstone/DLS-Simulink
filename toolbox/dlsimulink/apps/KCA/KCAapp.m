@@ -1,11 +1,14 @@
 classdef KCAapp < matlab.apps.App
-    % KCAapp  Kinematic Coupling Generator.
-    % Interactive GUI for parametric design studies of three-groove
-    % kinematic couplings. Enables real-time exploration of material
-    % selection, geometry, loads, preload, and error motion.
+    %KCAAPP Kinematic Coupling Generator.
+    %   Interactive GUI for parametric design studies of three-groove
+    %   kinematic couplings. Enables real-time exploration of material
+    %   selection, geometry, loads, preload, and error motion.
+    %   Computation is delegated to utils\kinematicCoupling.m which
+    %   reproduces the algorithm from kincoup.xls by John Hart, MIT PERG.
     %
-    % Computation is delegated to utils\kinematicCoupling.m which
-    % reproduces the algorithm from kincoup.xls by John Hart, MIT PERG.
+    %   See also KINEMATICCOUPLING
+    %
+    %   DLSimulink Toolbox
 
     % Used to locate and load the app's XML configuration file
     properties (Access = public, Constant)
@@ -135,86 +138,90 @@ classdef KCAapp < matlab.apps.App
                     1724000000, 204100000000, 0.29;...
                     1020000000, 200000000000, 0.29;...
                     1500000000, 200000000000, 0.29];
-        %Matgroove = Matball;
-        Matgroove =  [2758000000, 310300000000, 0.3;...
-            103400000, 10340000000, 0.2;...
-            1724000000, 204100000000, 0.29;...
-            1020000000, 200000000000, 0.29;...
-            1500000000, 200000000000, 0.29];
+    end
+
+    properties (Access = private, Constant)
+        % SidebarGrid row ranges for visibility toggling.
+        % These centralise the magic numbers so a reorder in the XML
+        % only requires updating the constants here.
+        SymmetricHiddenRows = 12:23
+        SymmetricHiddenPreloadRows = 45:54
+        PreloadAtBallHiddenRows = [43, 44, 48, 49, 53, 54]
+    end
+
+    properties (Access = private, Dependent)
+        Matgroove
+    end
+
+    methods
+        function value = get.Matgroove(app)
+            value = app.Matball;
+        end
     end
 
     methods (Access = private)
         % Computation and visualization methods (not exposed as callbacks)
 
         function computeResults(app)
-            % computeResults  Read UI controls, compute coupling mechanics,
-            % and update the schematic and output table.
-            % Called from every ValueChangedFcn and from startupFcn.
+            uiState = app.readUIState();
+            app.updateAngleDisplay(uiState.geometry.th);
+            res = kinematicCoupling(uiState.materials, uiState.geometry, ...
+                uiState.loads, uiState.errorPt, uiState.preload, uiState.symmetric);
+            app.updateSchematic(res.r, res.th, res.xbO, res.ybO, res.Fbn, res.Fb, ...
+                res.q, res.S, res.DeltaX, res.DeltaY, res.DeltaZ, res.DeltaRMS);
+            tData = app.buildOutputTable(res);
+            app.OutputTable.Data = tData;
+            app.applyTableStyling(tData);
+        end
 
-            % Map dropdown display names to material DB row indices.
-            % Use the dropdown's Items (includes any user-added materials).
+        function uiState = readUIState(app)
+            % Read all UI controls into a flat struct for the computation engine.
+            % Returns both geometry.r (raw) and geometry.th (angle-locked via
+            % kinematicAngles), plus materials, loads, errorPt, preload, symmetric.
             items = app.BallDropdown.Items;
             matbalIdx = max(1, find(strcmp(app.BallDropdown.Value, items), 1));
             matgrvIdx = max(1, find(strcmp(app.GrooveDropdown.Value, items), 1));
-
-            % Package UI inputs into structs for the computation engine
-            materials.Matball = app.Matball;
-            materials.Matgroove = app.Matgroove;
-            materials.ballIdx = matbalIdx;
-            materials.grooveIdx = matgrvIdx;
-
-            % geometry.r — read UI (unchanged); engine propagates r(2:3)=r(1)
-            % when symmetric
-            geometry.r = [app.r1.Value, app.r2.Value, app.r3.Value];
-
-            % Effective radii for the angle lock (symmetry forces r2 = r3 = r1)
+            uiState.materials.Matball = app.Matball;
+            uiState.materials.Matgroove = app.Matgroove;
+            uiState.materials.ballIdx = matbalIdx;
+            uiState.materials.grooveIdx = matgrvIdx;
+            uiState.geometry.r = [app.r1.Value, app.r2.Value, app.r3.Value];
             if app.SymmetricCheckBox.Value
                 effR = [app.r1.Value, app.r1.Value, app.r1.Value];
             else
                 effR = [app.r1.Value, app.r2.Value, app.r3.Value];
             end
-
-            % geometry.th — compute locked angles, update UI fields for display
-            % (th1 fixed at 0). Guard against non-positive radii, which would
-            % put acos() outside its domain in kinematicAngles.
             if any(effR <= 0) || any(~isfinite(effR))
                 warning('KCAapp:InvalidRadii', ...
                     'Coupling radii must be finite and positive; keeping previous angles.');
                 lockedTh = [app.th1.Value, app.th2.Value, app.th3.Value];
             else
-                lockedTh = kinematicAngles(effR, 0);        % th1 fixed at 0
+                lockedTh = kinematicAngles(effR, 0);
             end
-            app.th1.Value = lockedTh(1);
-            app.th2.Value = lockedTh(2);
-            app.th3.Value = lockedTh(3);
-            geometry.th = lockedTh;
-            geometry.thg = [app.thg1.Value, app.thg2.Value, app.thg3.Value];
-            geometry.Dball = [app.Dball1.Value, app.Dball2.Value, app.Dball3.Value];
-            geometry.Rgrv = [app.Rgrv1.Value, app.Rgrv2.Value, app.Rgrv3.Value];
+            uiState.geometry.th = lockedTh;
+            uiState.geometry.thg = [app.thg1.Value, app.thg2.Value, app.thg3.Value];
+            uiState.geometry.Dball = [app.Dball1.Value, app.Dball2.Value, app.Dball3.Value];
+            uiState.geometry.Rgrv = [app.Rgrv1.Value, app.Rgrv2.Value, app.Rgrv3.Value];
+            uiState.loads.FLx = app.FLx.Value; uiState.loads.FLy = app.FLy.Value; uiState.loads.FLz = app.FLz.Value;
+            uiState.loads.MLx = app.MLx.Value; uiState.loads.MLy = app.MLy.Value; uiState.loads.MLz = app.MLz.Value;
+            uiState.loads.XL = app.XL.Value; uiState.loads.YL = app.YL.Value; uiState.loads.ZL = app.ZL.Value;
+            uiState.errorPt.X = app.Xerr.Value; uiState.errorPt.Y = app.Yerr.Value; uiState.errorPt.Z = app.Zerr.Value;
+            uiState.preload.Fpx = [app.Fpx1.Value, app.Fpx2.Value, app.Fpx3.Value];
+            uiState.preload.Fpy = [app.Fpy1.Value, app.Fpy2.Value, app.Fpy3.Value];
+            uiState.preload.Fpz = [app.Fpz1.Value, app.Fpz2.Value, app.Fpz3.Value];
+            uiState.preload.rp = [app.rp_pre1.Value, app.rp_pre2.Value, app.rp_pre3.Value];
+            uiState.preload.thp = [app.thp_pre1.Value, app.thp_pre2.Value, app.thp_pre3.Value];
+            uiState.preload.useBallLocations = app.PreloadAtBallCheckBox.Value;
+            uiState.symmetric = app.SymmetricCheckBox.Value;
+        end
 
-            loads.FLx = app.FLx.Value; loads.FLy = app.FLy.Value; loads.FLz = app.FLz.Value;
-            loads.MLx = app.MLx.Value; loads.MLy = app.MLy.Value; loads.MLz = app.MLz.Value;
-            loads.XL = app.XL.Value; loads.YL = app.YL.Value; loads.ZL = app.ZL.Value;
+        function updateAngleDisplay(app, th)
+            app.th1.Value = th(1);
+            app.th2.Value = th(2);
+            app.th3.Value = th(3);
+        end
 
-            errorPt.X = app.Xerr.Value; errorPt.Y = app.Yerr.Value; errorPt.Z = app.Zerr.Value;
-
-            preload.Fpx = [app.Fpx1.Value, app.Fpx2.Value, app.Fpx3.Value];
-            preload.Fpy = [app.Fpy1.Value, app.Fpy2.Value, app.Fpy3.Value];
-            preload.Fpz = [app.Fpz1.Value, app.Fpz2.Value, app.Fpz3.Value];
-            preload.rp = [app.rp_pre1.Value, app.rp_pre2.Value, app.rp_pre3.Value];
-            preload.thp = [app.thp_pre1.Value, app.thp_pre2.Value, app.thp_pre3.Value];
-            preload.useBallLocations = app.PreloadAtBallCheckBox.Value;
-
-            symmetric = app.SymmetricCheckBox.Value;
-
-            % Run the computation engine — pure linear algebra, ~1ms
-            res = kinematicCoupling(materials, geometry, loads, errorPt, preload, symmetric);
-
-            % Update schematic with coupling positions and computed values
-            app.updateSchematic(res.r, res.th, res.xbO, res.ybO, res.Fbn, res.Fb, ...
-                res.q, res.S, res.DeltaX, res.DeltaY, res.DeltaZ, res.DeltaRMS);
-
-            % Build output table: 11 rows x 7 columns (Name + 6 contact points)
+        function tData = buildOutputTable(app, res)
             sigS = res.sigsmax / (0.5 * res.S);
             tData = {'Fbn [N]',res.Fbn(1),res.Fbn(2),res.Fbn(3),res.Fbn(4),res.Fbn(5),res.Fbn(6);
                 'Fb [N]',res.Fb(1),res.Fb(2),res.Fb(3),res.Fb(4),res.Fb(5),res.Fb(6);
@@ -227,12 +234,12 @@ classdef KCAapp < matlab.apps.App
                 'DeltaY [um]',1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY,1e6*res.DeltaY;
                 'DeltaZ [um]',1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ,1e6*res.DeltaZ;
                 'DeltaRMS [um]',1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS,1e6*res.DeltaRMS};
-            app.OutputTable.Data = tData;
+        end
 
+        function applyTableStyling(app, tData)
             % Color the 'Max. Shear / 0.5*UTS' row (data row 6, cols 2-7)
             % by margin: value < 1 → dark green on light greenish-grey (OK);
             % value > 1 → dark red on light reddish-grey (limit exceeded).
-            % Stale styles from a previous pass are cleared first.
             if height(app.OutputTable.StyleConfigurations) > 0
                 removeStyle(app.OutputTable, 1:height(app.OutputTable.StyleConfigurations));
             end
@@ -378,7 +385,6 @@ classdef KCAapp < matlab.apps.App
             if any(isnan([hz,md,pr])); return; end
             n = size(app.Matball,1)+1;
             app.Matball(n,:)=[hz,md,pr];
-            app.Matgroove(n,:)=[hz,md,pr];
             items = app.BallDropdown.Items;
             app.BallDropdown.Items=[items,{name}];
             app.GrooveDropdown.Items=[app.GrooveDropdown.Items,{name}];
@@ -387,20 +393,13 @@ classdef KCAapp < matlab.apps.App
 
         % Value changed function: SymmetricCheckBox
         function onSymmetricChanged(app, event)
-            % Toggle coupling 2 & 3 sidebar visibility. When symmetric,
-            % hide geometry rows 12-23, all preload rows 45-54 (coupling
-            % 2 & 3), and preload-at-ball rp/thp rows 48,49,53,54.
-            % After the symmetry toggle, also apply the preload checkbox
-            % state to ensure rp/thp fields are correctly shown/hidden.
             rh = app.SidebarGrid.RowHeight;
             if app.SymmetricCheckBox.Value
-                for i = [12:23, 45:54]; rh{i} = 0; end
+                for i = [app.SymmetricHiddenRows, app.SymmetricHiddenPreloadRows]; rh{i} = 0; end
             else
-                for i = [12:23, 45:54]; rh{i} = 'fit'; end
-                % When symmetry is disabled, re-apply preload checkbox
-                % visibility (may hide rp/thp fields if checked)
+                for i = [app.SymmetricHiddenRows, app.SymmetricHiddenPreloadRows]; rh{i} = 'fit'; end
                 if app.PreloadAtBallCheckBox.Value
-                    for i = [43,44,48,49,53,54]; rh{i} = 0; end
+                    for i = app.PreloadAtBallHiddenRows; rh{i} = 0; end
                 end
             end
             app.SidebarGrid.RowHeight = rh;
@@ -409,14 +408,11 @@ classdef KCAapp < matlab.apps.App
 
         % Value changed function: PreloadAtBallCheckBox
         function onPreloadAtBallChanged(app, event)
-            % Toggle rp_pre and thp_pre field visibility. When checked,
-            % the coupling locations are used for preload positions so
-            % the radial and angular fields are hidden (row height 0).
             rh = app.SidebarGrid.RowHeight;
             if app.PreloadAtBallCheckBox.Value
-                for i = [43, 44, 48, 49, 53, 54]; rh{i} = 0; end
+                for i = app.PreloadAtBallHiddenRows; rh{i} = 0; end
             else
-                for i = [43, 44, 48, 49, 53, 54]; rh{i} = 'fit'; end
+                for i = app.PreloadAtBallHiddenRows; rh{i} = 'fit'; end
             end
             app.SidebarGrid.RowHeight = rh;
             app.computeResults();

@@ -1,17 +1,21 @@
 function th = kinematicAngles(r, th1)
-% KINEMATICANGLES  Compute coupling-point angles from radii.
+%KINEMATICANGLES Compute coupling-point angles from radii.
 %   th = kinematicAngles(r, th1) returns 3-element angle array such that
 %   the triangle with vertices (r(i), th(i)) has its incenter at the
-%   origin.  θ(1) = th1; θ(2), θ(3) are locked by the incenter-at-origin
-%   constraint (bisector rule for kinematic couplings).
+%   origin.  Theta(1) = th1; theta(2), theta(3) are locked by the
+%   incenter-at-origin constraint (bisector rule for kinematic couplings).
 %
-%   Algorithm: find ρ ∈ (0, min(r)] solving
-%     acos(ρ/r1) + acos(ρ/r2) + acos(ρ/r3) = π
+%   Algorithm: find rho in (0, min(r)] solving
+%     acos(rho/r1) + acos(rho/r2) + acos(rho/r3) = pi
 %   via bisection; then
-%     Δ_i = 2·acos(ρ/r_i)
+%     Delta_i = 2 * acos(rho/r_i)
 %     th(1) = th1
-%     th(2) = th1 + (Δ1 + Δ2)/2
-%     th(3) = th1 + Δ2/2 + π
+%     th(2) = th1 + (Delta1 + Delta2)/2
+%     th(3) = th1 + Delta2/2 + pi
+%
+%   See also KINEMATICTRIANGLE, KINEMATICCOUPLING
+%
+%   DLSimulink Toolbox
 
     arguments
         r   (1,3) {mustBeReal, mustBePositive, mustBeFinite}

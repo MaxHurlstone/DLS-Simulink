@@ -1,54 +1,50 @@
 function results = kinematicCoupling(materials, geometry, loads, errorPt, preload, symmetric)
-% KINEMATCOUPLING Compute kinematic coupling contact mechanics.
-% Parametric design of three-groove kinematic couplings.
-% Applies to standard symmetric (equal angle, equal groove) and asymmetric
-% couplings.  Adapted from kincoup.xls by John Hart, MIT PERG, March 2001.
-% All metric units (N-m-s).
+%KINEMATICCOUPLING Compute kinematic coupling contact mechanics.
+%   Parametric design of three-groove kinematic couplings.  Applies to
+%   standard symmetric (equal angle, equal groove) and asymmetric couplings.
+%   Adapted from kincoup.xls by John Hart, MIT PERG, March 2001.
+%   All metric units (N-m-s).
 %
-% Inputs:
-%   materials   struct with fields:
-%       .Matball    Nx3 ball material properties [Hertz_limit(Pa), E(Pa), nu]
-%       .Matgroove  Nx3 groove material properties [Hertz_limit(Pa), E(Pa), nu]
-%       .ballIdx    row index into .Matball for the selected ball material
-%       .grooveIdx  row index into .Matgroove for the selected groove material
+%   Inputs:
+%   materials - struct with fields Matball (Nx3 [Hertz_limit,E,nu]),
+%       Matgroove (Nx3), ballIdx, grooveIdx
+%   geometry  - struct with 3-element fields r, th, thg, Dball, Rgrv
+%   loads     - struct with fields FLx, FLy, FLz, MLx, MLy, MLz, XL, YL, ZL
+%   errorPt   - struct with fields X, Y, Z
+%   preload   - struct with 3-element fields Fpx, Fpy, Fpz, rp, thp
+%   symmetric - logical, true = propagate coupling-1 parameters to 2 and 3
 %
-%   geometry    struct with 3-element fields (one per coupling):
-%       .r          radial coordinate (m)
-%       .th         angular coordinate (rad)
-%       .thg        groove angle (rad)
-%       .Dball      equivalent ball diameter (m)
-%       .Rgrv       groove radius (m, negative for trough)
+%   Outputs:
+%   results.Fbn     - 6x1 contact forces with applied loads (N)
+%   results.Fb      - 6x1 preload-only contact forces (N)
+%   results.q       - 6x1 maximum Hertzian contact pressure (Pa)
+%   results.sigsmax - 6x1 maximum shear stress = 0.3*q (Pa)
+%   results.S       - allowable stress = min(ball, groove Hertz limits) (Pa)
+%   results.ratio   - 3x1 Hertz theory validity ratio (>5 recommended)
+%   results.DeltaX  - error motion at point of interest, X (m)
+%   results.DeltaY  - error motion at point of interest, Y (m)
+%   results.DeltaZ  - error motion at point of interest, Z (m)
+%   results.DeltaRMS - RMS error motion at point of interest (m)
+%   results.r       - 3-element radial coordinate after symmetry (m)
+%   results.th      - 3-element angular coordinate after symmetry (rad)
+%   results.xbO     - 3-element original ball center X coordinates (m)
+%   results.ybO     - 3-element original ball center Y coordinates (m)
 %
-%   loads       struct with applied disturbance loads:
-%       .FLx, .FLy, .FLz     force components (N)
-%       .MLx, .MLy, .MLz     torque components (N-m)
-%       .XL,  .YL,  .ZL      load application point (m)
+%   See also KINEMATICANGLES, KINEMATICTRIANGLE
 %
-%   errorPt     struct with error-reporting point coordinates:
-%       .X, .Y, .Z          (m)
-%
-%   preload     struct with 3-element fields (one per coupling):
-%       .Fpx, .Fpy, .Fpz    preload force components (N)
-%       .rp                  preload radial coordinate (m)
-%       .thp                 preload angular coordinate (rad)
-%
-%   symmetric   boolean: true = propagate coupling-1 parameters to 2 & 3
-%
-% Output (results struct):
-%   .Fbn        6x1 contact forces with applied loads (N)
-%   .Fb         6x1 preload-only contact forces (N)
-%   .q          6x1 maximum Hertzian contact pressure (Pa)
-%   .sigsmax    6x1 maximum shear stress = 0.3*q (Pa)
-%   .S          allowable stress = min(ball, groove Hertz limits) (Pa)
-%   .ratio      3x1 Hertz theory validity ratio (>5 recommended)
-%   .DeltaX     error motion at point of interest, X (m)
-%   .DeltaY     error motion at point of interest, Y (m)
-%   .DeltaZ     error motion at point of interest, Z (m)
-%   .DeltaRMS   RMS error motion at point of interest (m)
-%   .r          3-element radial coordinate after symmetry propagation (m)
-%   .th         3-element angular coordinate after symmetry propagation (rad)
-%   .xbO        3-element original ball center X coordinates (m)
-%   .ybO        3-element original ball center Y coordinates (m)
+%   DLSimulink Toolbox
+
+    arguments (Input)
+        materials (1,1) struct
+        geometry  (1,1) struct
+        loads     (1,1) struct
+        errorPt   (1,1) struct
+        preload   (1,1) struct
+        symmetric (1,1) logical
+    end
+    arguments (Output)
+        results (1,1) struct
+    end
 
 % ----- Unpack inputs ---------------------------------------------------
 Matball = materials.Matball;
@@ -156,11 +152,11 @@ for j = 1:3
     ct = Re(j) * sqrt((1/Rgrv(j))^2 + (1/Rbmajor(j)-1/Rbminor(j))^2 ...
         + 2*(-1/Rgrv(j))*(1/Rbmajor(j)-1/Rbminor(j)));
     theta_c(j) = acos(ct);
-    alpha(j) = 1.939*2.71831^(-5.26*theta_c(j)) + 1.78*2.71831^(-1.09*theta_c(j)) ...
+    alpha(j) = 1.939*exp(1)^(-5.26*theta_c(j)) + 1.78*exp(1)^(-1.09*theta_c(j)) ...
         + 0.723/theta_c(j) + 0.221;
-    beta(j) = 35.228*2.71831^(-0.98*theta_c(j)) - 32.424*2.71831^(-1.0475*theta_c(j)) ...
+    beta(j) = 35.228*exp(1)^(-0.98*theta_c(j)) - 32.424*exp(1)^(-1.0475*theta_c(j)) ...
         + 1.486*theta_c(j) - 2.634;
-    lambda(j) = -0.214*2.71831^(-4.95*theta_c(j)) - 0.179*theta_c(j)^2 ...
+    lambda(j) = -0.214*exp(1)^(-4.95*theta_c(j)) - 0.179*theta_c(j)^2 ...
         + 0.555*theta_c(j) + 0.319;
 end
 

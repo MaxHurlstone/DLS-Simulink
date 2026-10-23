@@ -1,9 +1,12 @@
 classdef kinematicAnglesTest < matlab.unittest.TestCase
-    % KINEMATICANGLESTEST  Unit tests for the locked coupling-angle solver.
+    %KINEMATICANGLESTEST Unit tests for the locked coupling-angle solver.
+    %
+    %   DLSimulink Toolbox
 
     methods (TestClassSetup)
         function addUtilsToPath(testCase)
             utilDir = fullfile(fileparts(mfilename('fullpath')), '..', 'utils');
+            testCase.addTeardown(@() rmpath(utilDir));
             addpath(utilDir);
         end
     end

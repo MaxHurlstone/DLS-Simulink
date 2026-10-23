@@ -1,21 +1,31 @@
 function tri = kinematicTriangle(xb, yb)
-% KINEMATICTRIANGLE  Compute incenter and groove angles for three ball positions.
-% In a kinematic coupling, the groove at each ball position bisects the
-% internal angle of the coupling triangle at that vertex.  The coupling
-% centroid is therefore the incenter (angle bisector intersection), not
-% the centroid (arithmetic mean of vertices).
+%KINEMATICTRIANGLE Compute incenter and groove angles for three ball positions.
+%   In a kinematic coupling, the groove at each ball position bisects the
+%   internal angle of the coupling triangle at that vertex.  The coupling
+%   centroid is therefore the incenter (angle bisector intersection), not
+%   the centroid (arithmetic mean of vertices).
 %
-% Input:
-%   xb  3-element array of ball center X coordinates (m)
-%   yb  3-element array of ball center Y coordinates (m)
+%   Inputs:
+%   xb - ball center X coordinates, 1x3 (m)
+%   yb - ball center Y coordinates, 1x3 (m)
 %
-% Output (struct tri):
-%   .xci, .yci     incenter coordinates (m)
-%   .sides         3-element side lengths; sides(j) opposite vertex j (m)
-%   .bisectorX     x-components of inward-pointing angle bisectors (3)
-%   .bisectorY     y-components of inward-pointing angle bisectors (3)
-%   .normalX       x-components of CCW perpendicular to each bisector (3)
-%   .normalY       y-components of CCW perpendicular to each bisector (3)
+%   Outputs:
+%   tri.xci,yci  - incenter coordinates (m)
+%   tri.sides    - 3-element side lengths opposite vertex j (m)
+%   tri.bisectorX, tri.bisectorY - inward-pointing angle bisectors (3)
+%   tri.normalX, tri.normalY     - CCW perpendicular to each bisector (3)
+%
+%   See also KINEMATICANGLES, KINEMATICCOUPLING
+%
+%   DLSimulink Toolbox
+
+    arguments (Input)
+        xb (1,3) {mustBeReal, mustBeFinite}
+        yb (1,3) {mustBeReal, mustBeFinite}
+    end
+    arguments (Output)
+        tri (1,1) struct
+    end
 
 % Side vectors between adjacent ball positions
 vx12 = xb(2) - xb(1);  vy12 = yb(2) - yb(1);
