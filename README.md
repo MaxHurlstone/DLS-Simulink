@@ -1,18 +1,16 @@
 # DLSimulink
 
-Install **DLSimulink**, then type `dlshelp` in the MATLAB command window!
+Install **DLSimulink**, then type `dlshelp` in the MATLAB command window.
 
 ## Status
 
-Under development!
+This toolbox under development. If you find any bugs, please contact me: <max.hurlstone@diamond.ac.uk>.
 
 ## About
 
-DLSimulink is a MATLAB toolbox that aims to standardise and streamline
-engineering analysis at the UK's national synchrotron, [Diamond Light Source](https://www.diamond.ac.uk/Home.html) (DLS).
+DLSimulink is a MATLAB toolbox that aims to standardise engineering analysis at the UK's national synchrotron, [Diamond Light Source](https://www.diamond.ac.uk/Home.html).
 
-DLSimulink was initially developed, and is currently maintained by 
-[Max Hurlstone](https://uk.mathworks.com/matlabcentral/profile/authors/38911387), Mechanical Design Engineer at DLS.
+DLSimulink was initially developed to store various design calculators: hopefully they prove useful for other engineers!
 
 ## Getting started
 
@@ -21,18 +19,14 @@ DLSimulink was initially developed, and is currently maintained by
 To install, either head to Add-Ons in MATLAB ("Home" tab, under the "Environment" section), and search for DLSimulink. Click add to MATLAB.
 
 Or, go to the [MATLAB File Exchange](https://www.mathworks.com/matlabcentral/fileexchange/) and search for DLSimulink. 
-Click Download -> toolbox. Once downloaded, click the .mltbx file in your downloads. 
+Click Download -> toolbox. Once downloaded, click the .mltbx file in your downloads.
 
-### Documentation
+Once installed type `dlshelp` in the MATLAB command window to get started. 
 
-Documentation is a work in progress...but for the moment head to the toolbox page in the MATLAB Add-Ons tab. 
-The "Functions" tab for the toolbox will list all source code and give an idea of functionality.
+### Updates
+
+The MATLAB Add-Ons manager in MATLAB will check for updates for this toolbox and allow you to install them as needed.
 
 ## Contributing
-
-The more people willing to contribute to this, the better. Obviously, I hope this
-toolbox achieves its goal of standardising and streamlining engineering at DLS. But also,
-contributing to the toolbox is a great way to learn proper code development skills, which I didn't have before trying this
-(and probably still don't!).
-
-If you are interested in contributing, contact me: **max.hurlstone@diamond.ac.uk** 
+ 
+If you are interested in contributing or have feedback, contact me: <max.hurlstone@diamond.ac.uk>.
