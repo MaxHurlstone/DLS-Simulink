@@ -45,10 +45,10 @@ supported-platforms = [
     "macos",
 ]
 display-name = "DLSimulink"
-version = "2.0.6"
+version = "2.1.0"
 id = "f1be6fd5-7861-44c4-bfec-a98ded851b12"
 use-license-bsd = true
-lastAccessed = "1793005429820"
+lastAccessed = "1793009684569"
 provider.name = "Max Hurlstone"
 provider.email = "max.hurlstone@diamond.ac.uk"
 provider.organization = "https://www.diamond.ac.uk/Home.html"
@@ -57,4 +57,5 @@ package-root = "toolbox/dlsimulink"
 preview-image-file = "images/dlsimulink.png"
 app-gallery-files = [
     "toolbox/dlsimulink/apps/SPP/SloperApp.m",
+    "toolbox/dlsimulink/apps/KCA/KCAapp.m",
 ]
