@@ -1,0 +1,843 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
+<MATLABApp schemaVersion='1.0.0' release='R2026b.0' minRelease='R2026b'>
+    <UIFigure name='UIFigure'>
+        <AutoResizeChildren>'off'</AutoResizeChildren>
+        <Name>'Kinematic Coupling Generator'</Name>
+        <Position>[100 100 950 720]</Position>
+        <Children>
+            <GridLayout name='RootGrid'>
+                <ColumnSpacing>0</ColumnSpacing>
+                <ColumnWidth>{320, '1x'}</ColumnWidth>
+                <Padding>[0 0 0 0]</Padding>
+                <RowHeight>{'1x'}</RowHeight>
+                <RowSpacing>0</RowSpacing>
+                <Children>
+                    <GridLayout name='SidebarGrid'>
+                        <ColumnSpacing>8</ColumnSpacing>
+                        <ColumnWidth>{'fit', '1x'}</ColumnWidth>
+                        <Layout>
+                            <Column>1</Column>
+                            <Row>1</Row>
+                        </Layout>
+                        <Padding>[6 6 6 6]</Padding>
+                        <RowHeight>{'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 'fit', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</RowHeight>
+                        <RowSpacing>4</RowSpacing>
+                        <Scrollable>'on'</Scrollable>
+                        <Children>
+                            <Label name='MaterialsHeader'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>1</Row>
+                                </Layout>
+                                <Text>'MATERIALS'</Text>
+                            </Label>
+                            <Label name='BallLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>2</Row>
+                                </Layout>
+                                <Text>'Ball:'</Text>
+                            </Label>
+                            <DropDown name='BallDropdown'>
+                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'AMS 5629 (H950)'}</Items>
+<Layout>
+                                    <Column>2</Column>
+                                    <Row>2</Row>
+                                </Layout>
+                                <Value>'Carbide'</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </DropDown>
+                            <Label name='GrooveLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>3</Row>
+                                </Layout>
+                                <Text>'Groove:'</Text>
+                            </Label>
+                            <DropDown name='GrooveDropdown'>
+                                <Items>{'Carbide', 'Plastic', 'RC62 Steel', 'RC57 420 Stainless', 'AMS 5629 (H950)'}</Items>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>3</Row>
+                                </Layout>
+                                <Value>'AMS 5629 (H950)'</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </DropDown>
+                            <Button name='AddCustomButton'>
+                                <ButtonPushedFcn>onAddCustomMaterial</ButtonPushedFcn>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>4</Row>
+                                </Layout>
+                                <Text>'Add Custom'</Text>
+                                <BackgroundColor>[1 0.8118 0]</BackgroundColor>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <FontWeight>'bold'</FontWeight>
+                            </Button>
+                            <CheckBox name='SymmetricCheckBox'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>5</Row>
+                                </Layout>
+                                <Text>'Symmetric'</Text>
+                                <Value>true</Value>
+                                <ValueChangedFcn>onSymmetricChanged</ValueChangedFcn>
+                            </CheckBox>
+                            <Label name='Coupling1Header'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>6</Row>
+                                </Layout>
+                                <Text>'COUPLING 1'</Text>
+                            </Label>
+                            <Label name='rLabel1'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>7</Row>
+                                </Layout>
+                                <Text>'Radius [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='r1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>7</Row>
+                                </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thLabel1'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>8</Row>
+                                </Layout>
+                                <Text>'Angle [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='th1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>8</Row>
+                                </Layout>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
+                                <Value>0</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thgLabel1'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>9</Row>
+                                </Layout>
+                                <Text>'Groove ang [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thg1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>9</Row>
+                                </Layout>
+                                <Value>0.785398163397448</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='DballLabel1'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>10</Row>
+                                </Layout>
+                                <Text>'Ball D [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Dball1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>10</Row>
+                                </Layout>
+                                <Value>0.008</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='RgrvLabel1'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>11</Row>
+                                </Layout>
+                                <Text>'Groove R [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Rgrv1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>11</Row>
+                                </Layout>
+                                <Value>1000000</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Coupling2Header'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>12</Row>
+                                </Layout>
+                                <Text>'COUPLING 2'</Text>
+                            </Label>
+                            <Label name='rLabel2'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>13</Row>
+                                </Layout>
+<Text>'Radius [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='r2'>
+                            <Layout>
+                                <Column>2</Column>
+                                <Row>13</Row>
+                            </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thLabel2'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>14</Row>
+                                </Layout>
+                                <Text>'Angle [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='th2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>14</Row>
+                                </Layout>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
+                                <Value>3.665191429</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thgLabel2'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>15</Row>
+                                </Layout>
+                                <Text>'Groove ang [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thg2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>15</Row>
+                                </Layout>
+                                <Value>0.785398163397448</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='DballLabel2'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>16</Row>
+                                </Layout>
+                                <Text>'Ball D [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Dball2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>16</Row>
+                                </Layout>
+                                <Value>0.008</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='RgrvLabel2'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>17</Row>
+                                </Layout>
+                                <Text>'Groove R [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Rgrv2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>17</Row>
+                                </Layout>
+                                <Value>1000000</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Coupling3Header'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>18</Row>
+                                </Layout>
+                                <Text>'COUPLING 3'</Text>
+                            </Label>
+                            <Label name='rLabel3'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>19</Row>
+                                </Layout>
+                                <Text>'r [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='r3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>19</Row>
+                                </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thLabel3'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>20</Row>
+                                </Layout>
+                                <Text>'Angle [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='th3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>20</Row>
+                                </Layout>
+                                <BackgroundColor>[0.90 0.90 0.90]</BackgroundColor>
+                                <Value>5.759586532</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thgLabel3'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>21</Row>
+                                </Layout>
+                                <Text>'Groove ang [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thg3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>21</Row>
+                                </Layout>
+                                <Value>0.785398163397448</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='DballLabel3'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>22</Row>
+                                </Layout>
+                                <Text>'Ball D [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Dball3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>22</Row>
+                                </Layout>
+                                <Value>0.008</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='RgrvLabel3'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>23</Row>
+                                </Layout>
+                                <Text>'Groove R [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Rgrv3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>23</Row>
+                                </Layout>
+                                <Value>1000000</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='LoadsHeader'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>24</Row>
+                                </Layout>
+                                <Text>'DISTURBANCE LOADS'</Text>
+                            </Label>
+                            <Label name='FLxLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>25</Row>
+                                </Layout>
+                                <Text>'FLx [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='FLx'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>25</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='FLyLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>26</Row>
+                                </Layout>
+                                <Text>'FLy [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='FLy'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>26</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='FLzLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>27</Row>
+                                </Layout>
+                                <Text>'FLz [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='FLz'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>27</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='MLxLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>28</Row>
+                                </Layout>
+                                <Text>'MLx [N-m]:'</Text>
+                            </Label>
+                            <NumericEditField name='MLx'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>28</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='MLyLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>29</Row>
+                                </Layout>
+                                <Text>'MLy [N-m]:'</Text>
+                            </Label>
+                            <NumericEditField name='MLy'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>29</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='MLzLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>30</Row>
+                                </Layout>
+                                <Text>'MLz [N-m]:'</Text>
+                            </Label>
+                            <NumericEditField name='MLz'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>30</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='XLLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>31</Row>
+                                </Layout>
+                                <Text>'XL [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='XL'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>31</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='YLLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>32</Row>
+                                </Layout>
+                                <Text>'YL [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='YL'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>32</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='ZLLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>33</Row>
+                                </Layout>
+                                <Text>'ZL [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='ZL'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>33</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='ErrorHeader'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>34</Row>
+                                </Layout>
+                                <Text>'ERROR POINT'</Text>
+                            </Label>
+                            <Label name='XerrLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>35</Row>
+                                </Layout>
+                                <Text>'Xerr [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Xerr'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>35</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='YerrLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>36</Row>
+                                </Layout>
+                                <Text>'Yerr [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Yerr'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>36</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='ZerrLabel'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>37</Row>
+                                </Layout>
+                                <Text>'Zerr [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='Zerr'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>37</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='PreloadHeader'>
+                                <FontWeight>'bold'</FontWeight>
+                                <FontColor>[0.1294 0.1608 0.3961]</FontColor>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>38</Row>
+                                </Layout>
+                                <Text>'PRELOAD'</Text>
+                            </Label>
+                            <CheckBox name='PreloadAtBallCheckBox'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>39</Row>
+                                </Layout>
+                                <Text>'Preload at Ball Locations'</Text>
+                                <Value>true</Value>
+                                <ValueChangedFcn>onPreloadAtBallChanged</ValueChangedFcn>
+                            </CheckBox>
+                            <Label name='Fpx1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>40</Row>
+                                </Layout>
+                                <Text>'Force X 1 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpx1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>40</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpy1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>41</Row>
+                                </Layout>
+                                <Text>'Force Y 1 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpy1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>41</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpz1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>42</Row>
+                                </Layout>
+                                <Text>'Force Z 1 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpz1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>42</Row>
+                                </Layout>
+                                <Value>-100</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='rp_pre1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>43</Row>
+                                </Layout>
+                                <Text>'Radius 1 [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='rp_pre1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>43</Row>
+                                </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thp_pre1Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>44</Row>
+                                </Layout>
+                                <Text>'Angle 1 [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thp_pre1'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>44</Row>
+                                </Layout>
+                                <Value>1.5707963267949</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpx2Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>45</Row>
+                                </Layout>
+                                <Text>'Force X 2 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpx2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>45</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpy2Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>46</Row>
+                                </Layout>
+                                <Text>'Force Y 2 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpy2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>46</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpz2Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>47</Row>
+                                </Layout>
+                                <Text>'Force Z 2 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpz2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>47</Row>
+                                </Layout>
+                                <Value>-100</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='rp_pre2Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>48</Row>
+                                </Layout>
+                                <Text>'Radius 2 [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='rp_pre2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>48</Row>
+                                </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thp_pre2Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>49</Row>
+                                </Layout>
+                                <Text>'Angle 2 [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thp_pre2'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>49</Row>
+                                </Layout>
+                                <Value>3.665191429</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpx3Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>50</Row>
+                                </Layout>
+                                <Text>'Force X 3 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpx3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>50</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpy3Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>51</Row>
+                                </Layout>
+                                <Text>'Force Y 3 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpy3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>51</Row>
+                                </Layout>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='Fpz3Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>52</Row>
+                                </Layout>
+                                <Text>'Force Z 3 [N]:'</Text>
+                            </Label>
+                            <NumericEditField name='Fpz3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>52</Row>
+                                </Layout>
+                                <Value>-100</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='rp_pre3Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>53</Row>
+                                </Layout>
+                                <Text>'Radius 3 [m]:'</Text>
+                            </Label>
+                            <NumericEditField name='rp_pre3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>53</Row>
+                                </Layout>
+                                <Value>0.025</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                            <Label name='thp_pre3Label'>
+                                <Layout>
+                                    <Column>1</Column>
+                                    <Row>54</Row>
+                                </Layout>
+                                <Text>'Angle 3 [rad]:'</Text>
+                            </Label>
+                            <NumericEditField name='thp_pre3'>
+                                <Layout>
+                                    <Column>2</Column>
+                                    <Row>54</Row>
+                                </Layout>
+                                <Value>5.759586532</Value>
+                                <ValueChangedFcn>onFieldChanged</ValueChangedFcn>
+                            </NumericEditField>
+                        </Children>
+                    </GridLayout>
+                    <Panel name='MainPanel'>
+                        <AutoResizeChildren>'off'</AutoResizeChildren>
+                        <Layout>
+                            <Column>2</Column>
+                            <Row>1</Row>
+                        </Layout>
+                        <Children>
+                            <GridLayout name='MainGrid'>
+                                <ColumnWidth>{'1x'}</ColumnWidth>
+                                <Padding>[8 8 8 8]</Padding>
+                                <RowHeight>{55, '1x', 260}</RowHeight>
+                                <RowSpacing>8</RowSpacing>
+                                <Children>
+                                    <Panel name='InfoPanel'>
+                                    <Layout><Column>1</Column><Row>1</Row></Layout>
+                                    <Title>'Kinematic Coupling Generator — Design Tool'</Title>
+                                    <FontWeight>'bold'</FontWeight>
+                                    <Children>
+                                        <GridLayout name='InfoGrid'>
+                                            <ColumnWidth>{'1x'}</ColumnWidth>
+                                            <RowHeight>{'fit'}</RowHeight>
+                                            <Children>
+                                                <Label name='InfoLabel'>
+                                                    <Layout><Column>1</Column><Row>1</Row></Layout>
+                                                    <Text>'Three-groove kinematic coupling design tool. Enter geometry, materials, loads, and preload to compute contact pressures, error motions, and Hertzian validity ratios.'</Text>
+                                                </Label>
+                                            </Children>
+                                        </GridLayout>
+                                    </Children>
+                                </Panel>
+                                    <UIAxes name='SchematicAxes'>
+                                        <Box>'on'</Box>
+                                        <Layout>
+                                            <Column>1</Column>
+                                            <Row>2</Row>
+                                        </Layout>
+                                        <Title>
+                                            <String>'Coupling Schematic'</String>
+                                        </Title>
+                                        <XGrid>'on'</XGrid>
+                                        <XLabel>
+                                            <String>'X (m)'</String>
+                                        </XLabel>
+                                        <YGrid>'on'</YGrid>
+                                        <YLabel>
+                                            <String>'Y (m)'</String>
+                                        </YLabel>
+                                    </UIAxes>
+                                    <Table name='OutputTable'>
+                                        <ColumnName>{'Name'; 'Point 1'; 'Point 2'; 'Point 3'; 'Point 4'; 'Point 5'; 'Point 6'}</ColumnName>
+                                        <Layout>
+                                            <Column>1</Column>
+<Row>3</Row>
+                                        </Layout>
+                                    </Table>
+                                </Children>
+                            </GridLayout>
+                        </Children>
+                    </Panel>
+                </Children>
+            </GridLayout>
+        </Children>
+    </UIFigure>
+    <RunConfiguration>
+        <StartupFcn>startupFcn</StartupFcn>
+    </RunConfiguration>
+    <AppDetails>
+        <Name>KCAapp</Name>
+        <Version>1.0</Version>
+    </AppDetails>
+    <InternalData>
+        <AppId>de2ea148-ff2f-f7c2-6ecf-a0deacb6a2b0</AppId>
+    </InternalData>
+    <!-- Thumbnail is used by file previewers. To change how the thumbnail is captured or stored, use the App Details dialog box in App Designer. -->
+    <Thumbnail autoCapture='true'></Thumbnail>
+</MATLABApp>
